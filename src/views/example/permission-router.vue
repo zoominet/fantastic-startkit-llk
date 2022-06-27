@@ -1,9 +1,9 @@
 <route>
 {
-    meta: {
-        layout: 'example',
-        requireLogin: true
-    }
+  meta: {
+    layout: 'example',
+    requireLogin: true
+  }
 }
 </route>
 
@@ -13,5 +13,5 @@ const tokenStore = useTokenStore()
 </script>
 
 <template>
-    <div>token信息：{{ tokenStore.token }}</div>
+  <div>token信息：{{ tokenStore.token }}</div>
 </template>

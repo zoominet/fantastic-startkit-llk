@@ -1,13 +1,13 @@
 export default [
-    {
-        path: '/',
-        component: () => import('@/views/index.vue')
+  {
+    path: '/',
+    component: () => import('@/views/index.vue'),
+  },
+  {
+    path: '/login',
+    component: () => import('@/views/login.vue'),
+    meta: {
+      title: '登录',
     },
-    {
-        path: '/login',
-        component: () => import('@/views/login.vue'),
-        meta: {
-            title: '登录'
-        }
-    }
+  },
 ]
