@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import pinia from './store'
 import router from './router'
-import globalProperties from '@/util/global.properties'
+import globalProperties from '@/utils/global.properties'
 // 加载 svg 图标
 import 'virtual:svg-icons-register'
 // 全局样式

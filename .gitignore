@@ -3,6 +3,7 @@ node_modules
 dist*
 dist-ssr
 *.local
-.eslintrc-auto-import.json
 src/assets/sprites/*.*
 !src/assets/sprites/.gitkeep
+auto-imports.d.ts
+components.d.ts
