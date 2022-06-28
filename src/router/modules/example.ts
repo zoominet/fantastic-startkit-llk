@@ -1,4 +1,4 @@
-const ExampleLayout = () => import('@/layout/example.vue')
+const ExampleLayout = () => import('@/layouts/example.vue')
 
 export default {
   path: '/example',
