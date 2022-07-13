@@ -1,0 +1,1 @@
+const e={key:"v-3a62456e",path:"/guide/mobile-support.html",title:"\u79FB\u52A8\u7AEF\u652F\u6301",lang:"zh-CN",frontmatter:{},excerpt:"",headers:[],git:{updatedTime:1653454137e3,contributors:[{name:"Hooray",email:"304327508@qq.com",commits:1},{name:"hooray",email:"304327508@qq.com",commits:1}]},filePathRelative:"guide/mobile-support.md"};export{e as data};
