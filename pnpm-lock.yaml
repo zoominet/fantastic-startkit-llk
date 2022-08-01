@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@element-plus/icons-vue': ^2.0.6
   '@vitejs/plugin-vue': ^3.0.0
   '@vitejs/plugin-vue-jsx': ^2.0.0
   axios: ^0.27.2
@@ -46,6 +47,7 @@ specifiers:
   vue-router: ^4.1.2
 
 dependencies:
+  '@element-plus/icons-vue': registry.npmmirror.com/@element-plus/icons-vue/2.0.6_vue@3.2.37
   axios: 0.27.2
   dayjs: registry.nlark.com/dayjs/1.10.7
   element-plus: registry.npmmirror.com/element-plus/2.2.11_vue@3.2.37
