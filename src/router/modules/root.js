@@ -9,5 +9,13 @@ export default [
         meta: {
             title: '登录'
         }
+    },
+    {
+        path: '/study',
+        component: () => import('@/views/card/study.vue'),
+        meta: {
+            title: '学习',
+            requireLogin: true
+        }
     }
 ]

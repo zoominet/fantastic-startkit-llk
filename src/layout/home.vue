@@ -4,67 +4,79 @@ const url =
 
 import { Search } from '@element-plus/icons-vue'
 
+const router = useRouter()
+// const route = useRoute()
+
+const mainHeight = () => {
+    return (window.innerHeight - 60) + 'px'
+}
+
+const homeVar = reactive({
+    gSearchValue: ''
+})
+
+const searchAction = () => {
+    router.push({ path: '/home/search-result' })
+}
 </script>
 
 <template>
-    <div class="common-layout">
+    <el-container>
+        <el-aside width="100px" :class="{'left-link':'1'}">
+            <el-row>
+                <el-col :span="24">
+                    <el-image style="width: 80px; height: 80px;" :src="url" :fit="fit" />
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24" :style="{height:'50px'}" />
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <RouterLink to="/home/newcard"><el-icon><CirclePlusFilled /></el-icon></RouterLink>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24" :style="{height:'50px'}" />
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <RouterLink to="/home/dashboard">首页</RouterLink>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <RouterLink to="/home/mycard">卡片</RouterLink>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24" :style="{height:'50px'}" />
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <RouterLink to="/home/profile"><el-icon><Setting /></el-icon></RouterLink>
+                </el-col>
+            </el-row>
+        </el-aside>
         <el-container>
-            <el-aside width="100px" :class="{'left-link':'1'}">
-                <el-row>
-                    <el-col :span="24">
-                        <el-image style="width: 80px; height: 80px;" :src="url" :fit="fit" />
+            <el-header height="60px">
+                <el-row :style="{'margin-top':'1px;'}">
+                    <el-col :span="6" :offset="9">
+                        <el-input
+                            v-model="homeVar.gSearchValue"
+                            placeholder="搜索卡片"
+                            class="input-with-select"
+                        >
+                            <template #append>
+                                <el-button :icon="Search" @click="searchAction" />
+                            </template>
+                        </el-input>
                     </el-col>
                 </el-row>
-                <el-row>
-                    <el-col :span="24" :style="{height:'50px'}" />
-                </el-row>
-                <el-row>
-                    <el-col :span="24">
-                        <RouterLink to="/home/dashboard"><el-icon><CirclePlusFilled /></el-icon></RouterLink>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="24" :style="{height:'50px'}" />
-                </el-row>
-                <el-row>
-                    <el-col :span="24">
-                        <RouterLink to="/home/dashboard">首页</RouterLink>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="24">
-                        <RouterLink to="/home/mycard">卡片</RouterLink>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="24" :style="{height:'50px'}" />
-                </el-row>
-                <el-row>
-                    <el-col :span="24">
-                        <RouterLink to="/home/dashboard"><el-icon><Setting /></el-icon></RouterLink>
-                    </el-col>
-                </el-row>
-            </el-aside>
-            <el-container>
-                <el-header height="60px">
-                    <el-row :style="{'margin-top':'1px;'}">
-                        <el-col :span="9" :offset="6">
-                            <el-input
-                                v-model="input3"
-                                placeholder="搜索卡片"
-                                class="input-with-select"
-                            >
-                                <template #append>
-                                    <el-button :icon="Search" />
-                                </template>
-                            </el-input>
-                        </el-col>
-                    </el-row>
-                </el-header>
-                <el-main><RouterView /></el-main>
-            </el-container>
+            </el-header>
+            <el-main :style="{height: mainHeight()}"><RouterView /></el-main>
         </el-container>
-    </div>
+    </el-container>
 </template>
 
 <style lang="scss">
@@ -73,20 +85,30 @@ import { Search } from '@element-plus/icons-vue'
     text-align: center;
     // font-size: 30px;
 }
-.left-link {
-    font-size: 30px;
-}
-.el-row:last-child {
-    margin-bottom: 0;
-}
 .el-col {
     border-radius: 4px;
 }
-.grid-content {
-    border-radius: 4px;
-    min-height: 36px;
+.left-link {
+    font-size: 25px;
+}
+.el-aside {
+    background-color: #ecf0f1;
+    border-right: 1px solid #d9dfe8;
+    margin-top: -8px;
+    margin-left: -8px;
+    margin-bottom: -16px;
+}
+.el-header {
+    border-bottom: 1px solid #d9dfe8;
+    margin-top: -8px;
+    margin-right: -8px;
 }
 .el-main {
-    background-color: rgb(245 240 240);
+    margin-bottom: -16px;
+    margin-right: -8px;
+    overflow: hidden;
+
+    --el-main-padding: 0;
 }
+
 </style>

@@ -30,18 +30,6 @@ const url =
 
 const onLogin = () => {
     // todo 表单校验
-    // api.post('login', form).then(res => {
-    //     // console.log(res)
-    //     if (res.ok === true) {
-
-    //     } else {
-    //         ElMessage({
-    //             type: 'error',
-    //             showClose: true,
-    //             message: res.msg
-    //         })
-    //     }
-    // })
 
     tokenStore.login(form).then(() => {
         ElMessage({

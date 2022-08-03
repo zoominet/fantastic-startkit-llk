@@ -20,6 +20,30 @@ export default {
                 title: '我的卡片',
                 requireLogin: true
             }
+        },
+        {
+            path: 'newcard',
+            component: () => import('@/views/home/newcard.vue'),
+            meta: {
+                title: '创建卡片',
+                requireLogin: true
+            }
+        },
+        {
+            path: 'search-result',
+            component: () => import('@/views/home/search.result.vue'),
+            meta: {
+                title: '创建卡片',
+                requireLogin: true
+            }
+        },
+        {
+            path: 'profile',
+            component: () => import('@/views/home/profile.vue'),
+            meta: {
+                title: '设置',
+                requireLogin: true
+            }
         }
     ]
 }

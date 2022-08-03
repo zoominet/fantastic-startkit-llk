@@ -18,7 +18,7 @@ const tokenStore = useTokenStore()
 const onLogout = () => {
 
     tokenStore.logout().then(() => {
-        router.replace({ path: '/' })
+        router.push({ path: '/' })
     })
 
 }

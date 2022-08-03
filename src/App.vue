@@ -19,7 +19,5 @@ watch(() => settingsStore.title, () => {
 </script>
 
 <template>
-    <div id="app">
-        <RouterView v-if="isRouterAlive" />
-    </div>
+    <RouterView v-if="isRouterAlive" />
 </template>
