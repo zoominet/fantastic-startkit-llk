@@ -81,11 +81,11 @@ const goNewCard = () => {
             <el-row>
                 <el-col>
                     <el-form :inline="true" size="mini" :model="formInline">
-                        <el-form-item label="Approved by">
-                            <el-input v-model="formInline.user" placeholder="Approved by" />
+                        <el-form-item label="关键字">
+                            <el-input v-model="formInline.user" placeholder="" />
                         </el-form-item>
-                        <el-form-item label="Activity zone">
-                            <el-select v-model="formInline.region" placeholder="Activity zone">
+                        <el-form-item label="掌握程度">
+                            <el-select v-model="formInline.region" placeholder="全部">
                                 <el-option label="Zone one" value="shanghai" />
                                 <el-option label="Zone two" value="beijing" />
                             </el-select>
@@ -146,7 +146,7 @@ const goNewCard = () => {
 .new-card {
     width: 130px;
     height: 160px;
-    background-color: #f9fbe7;
+    background-color: #f5f5f5;
 }
 .setname {
     width: 150px;

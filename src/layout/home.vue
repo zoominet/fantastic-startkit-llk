@@ -1,8 +1,13 @@
 <script setup>
 const url =
-    'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+    'https://linkard.oss-cn-beijing.aliyuncs.com/251659841319_.pic.jpg'
 
-import { Search } from '@element-plus/icons-vue'
+import {
+    HomeFilled,
+    Menu as IconMenu,
+    Setting,
+    Search
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 // const route = useRoute()
@@ -31,7 +36,32 @@ const searchAction = () => {
             <el-row>
                 <el-col :span="24" :style="{height:'50px'}" />
             </el-row>
-            <el-row>
+
+            <el-menu
+                default-active="1"
+                mode="vertical"
+                router="true"
+                :collapse="false"
+            >
+                <el-menu-item index="1" route="/home/dashboard">
+                    <el-icon><HomeFilled /></el-icon>
+                    <template #title>首页</template>
+                </el-menu-item>
+                <el-menu-item index="2" route="/home/newcard">
+                    <el-icon><plus /></el-icon>
+                    <template #title>创建</template>
+                </el-menu-item>
+                <el-menu-item index="3" route="/home/mycard">
+                    <el-icon><icon-menu /></el-icon>
+                    <template #title>卡片</template>
+                </el-menu-item>
+                <el-menu-item index="4" route="/home/profile">
+                    <el-icon><setting /></el-icon>
+                    <template #title>设置</template>
+                </el-menu-item>
+            </el-menu>
+
+            <!-- <el-row>
                 <el-col :span="24">
                     <RouterLink to="/home/newcard"><el-icon><CirclePlusFilled /></el-icon></RouterLink>
                 </el-col>
@@ -56,7 +86,7 @@ const searchAction = () => {
                 <el-col :span="24">
                     <RouterLink to="/home/profile"><el-icon><Setting /></el-icon></RouterLink>
                 </el-col>
-            </el-row>
+            </el-row> -->
         </el-aside>
         <el-container>
             <el-header height="60px">
@@ -66,6 +96,7 @@ const searchAction = () => {
                             v-model="homeVar.gSearchValue"
                             placeholder="搜索卡片"
                             class="input-with-select"
+                            @keydown.enter="searchAction"
                         >
                             <template #append>
                                 <el-button :icon="Search" @click="searchAction" />
@@ -80,6 +111,9 @@ const searchAction = () => {
 </template>
 
 <style lang="scss">
+body {
+    background-color: #fff;
+}
 .el-row {
     margin: 10px;
     text-align: center;
@@ -92,7 +126,7 @@ const searchAction = () => {
     font-size: 25px;
 }
 .el-aside {
-    background-color: #ecf0f1;
+    background-color: #fafafa;
     border-right: 1px solid #d9dfe8;
     margin-top: -8px;
     margin-left: -8px;
@@ -110,5 +144,17 @@ const searchAction = () => {
 
     --el-main-padding: 0;
 }
-
+.el-menu {
+    --el-menu-bg-color: #fafafa;
+    --el-menu-hover-bg-color: var(--el-color-primary-light-9);
+}
+.el-menu-item {
+    // width: 200px;
+    // min-height: 400px;
+    font-size: 18px;
+    margin-top: 30px;
+}
+// :root {
+// --el-menu-item-hover: var(--el-color-primary-light-9);
+// }
 </style>

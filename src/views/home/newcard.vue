@@ -62,15 +62,15 @@ const contentHeight = () => {
         <el-icon><star-filled /></el-icon>
     </el-divider> -->
     <el-row>
-        <el-col :span="12" :style="{'padding-top': '10px','background-color':'#F1F8E9'}">
+        <el-col :span="12" :style="{'padding-top': '10px'}">
             正面/问题
         </el-col>
-        <el-col :span="12" :style="{'padding-top': '10px','background-color':'#ECEFF1'}">
+        <el-col :span="12" :style="{'padding-top': '10px'}">
             背面/答案
         </el-col>
     </el-row>
     <el-row :style="{'margin-top':'-10px'}">
-        <el-col :span="12" :style="{'padding': '10px','background-color':'#F1F8E9'}">
+        <el-col :span="12" :style="{'padding': '10px'}">
             <!-- <TEditor ref="editor" v-model="cardForm.frontContent" /> -->
 
             <editor
@@ -85,7 +85,7 @@ const contentHeight = () => {
                 }"
             />
         </el-col>
-        <el-col :span="12" :style="{'padding': '10px','background-color':'#ECEFF1'}">
+        <el-col :span="12" :style="{'padding': '10px'}">
             <editor
                 v-model="cardForm.backContent"
                 api-key="7kdjc9shmflxt8292cfpao9aj9qm7i2vbfbyqc3un3sh1zb3"
