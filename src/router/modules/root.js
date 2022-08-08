@@ -1,7 +1,7 @@
 export default [
     {
         path: '/',
-        // redirect: '/home/dashboard',
+        redirect: '/home/dashboard',
         component: () => import('@/views/index.vue')
     },
     {

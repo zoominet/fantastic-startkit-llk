@@ -12,7 +12,13 @@ const tokenStore = useTokenStore()
 const onLogout = () => {
 
     tokenStore.logout().then(() => {
-        router.push({ path: '/' })
+        // router.push({ path: '/' })
+        router.push({
+            path: '/login',
+            query: {
+                redirect: router.currentRoute.fullPath
+            }
+        })
     })
 
 }
@@ -25,8 +31,8 @@ const tabPosition = ref('left')
     <el-row>
         <el-col :span="8" :offset="8">
             <el-tabs :tab-position="tabPosition" style="height: 300px;" class="demo-tabs">
-                <el-tab-pane label="我">开发中... </el-tab-pane>
-                <el-tab-pane label="设置">开发中...</el-tab-pane>
+                <el-tab-pane label="我">个人信息[WIP]</el-tab-pane>
+                <el-tab-pane label="设置">系统设置[WIP]</el-tab-pane>
                 <el-tab-pane label="关于">帮助每个人找到自己的记忆曲线，提高记忆效率和学习效果</el-tab-pane>
                 <el-tab-pane label="退出"><el-link @click="onLogout">注销</el-link></el-tab-pane>
             </el-tabs>

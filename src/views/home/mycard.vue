@@ -1,9 +1,13 @@
 <script setup name="HomeMycard">
 // const { proxy } = getCurrentInstance()
 const router = useRouter()
+import api from '@/api'
+
 // const route = useRoute()
 
 import { Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+
 import { reactive } from 'vue'
 
 const formInline = reactive({
@@ -28,6 +32,83 @@ const scrollerHeight = left => {
 const goNewCard = () => {
     router.push({ path: '/home/newcard' })
 }
+
+const pageData = reactive({
+    sets: [],
+    cards: [],
+    defaultSetId: 0
+})
+
+const getCards = setId => {
+    // console.log('setId:', setId)
+    if (setId != pageData.defaultSetId) {
+        pageData.defaultSetId = setId
+        pageData.cards = []
+        let querydata = {
+            '[]': {
+                'Card': {
+                    'set_id': setId,
+                    '@order': 'id'
+                },
+                'count': 0
+            },
+            '@datasource': 'hikari'
+        }
+        api.post('get', querydata).then(res => {
+            if (res.ok === true) {
+                pageData.cards = res['[]']
+            } else {
+                ElMessage({
+                    type: 'error',
+                    showClose: true,
+                    message: res.msg
+                })
+            }
+
+        }).catch(error => {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: error
+            })
+        })
+    }
+}
+
+const getSets = () => {
+    let querydata = {
+        '[]': {
+            'CardSet': {
+                '@role': 'OWNER',
+                '@order': 'id'
+            }
+        },
+        '@datasource': 'hikari'
+    }
+    api.post('get', querydata).then(res => {
+        if (res.ok === true) {
+            pageData.sets = res['[]']
+            pageData.defaultSetId = pageData.sets[0].CardSet.id
+            getCards(pageData.defaultSetId)
+            // console.log(pageData.sets)
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+}
+getSets()
+
 </script>
 
 <template>
@@ -52,7 +133,7 @@ const goNewCard = () => {
                     </el-col>
                 </el-row>
 
-                <el-row>
+                <!-- <el-row>
                     <el-col>
                         <el-card>
                             <div class="card-header">
@@ -62,16 +143,16 @@ const goNewCard = () => {
                             <div :inline="true" class="set-item"><el-icon><CopyDocument /></el-icon> 13 张</div>
                         </el-card>
                     </el-col>
-                </el-row>
+                </el-row> -->
 
-                <el-row v-for="i in 10" :key="i">
+                <el-row v-for="set in pageData.sets" :key="set">
                     <el-col>
-                        <el-card>
+                        <el-card @click="getCards(set.CardSet.id)">
                             <div class="card-header">
-                                <span>小学英语</span>
+                                <span>{{ set.CardSet.set_name }}</span>
                                 <el-button class="button" text><el-icon><MoreFilled /></el-icon></el-button>
                             </div>
-                            <div :inline="true" class="set-item"><el-icon><CopyDocument /></el-icon> 13 张</div>
+                            <div :inline="true" class="set-item"><el-icon><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张</div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -101,16 +182,16 @@ const goNewCard = () => {
                     <el-scrollbar :style="{height:scrollerHeight(false)}">
                         <el-space direction="horizontal" alignment="start">
                             <el-space wrap>
-                                <el-card class="new-card" :style="{boxShadow: `var(--el-box-shadow-light)`}" @click="goNewCard">
+                                <el-card class="new-card" @click="goNewCard">
                                     <div class="new-item">
                                         <p />
                                         <el-icon class="new-button"><Plus /></el-icon>
                                         <p>新卡片</p>
                                     </div>
                                 </el-card>
-                                <el-card v-for="i in 100" :key="i" class="box-card">
-                                    <div v-for="o in 1" :key="o" class="card-item">
-                                        {{ '中文中文文' + o }}
+                                <el-card v-for="card in pageData.cards" :key="card" class="box-card">
+                                    <div class="card-item">
+                                        {{ card.Card.front_content }}
                                     </div>
                                 </el-card>
                             </el-space>
@@ -137,7 +218,7 @@ const goNewCard = () => {
 .card-item {
     font-size: 14px;
     // margin-top: 10px;
-    text-align: left;
+    text-align: center;
 }
 .box-card {
     width: 130px;
@@ -147,6 +228,8 @@ const goNewCard = () => {
     width: 130px;
     height: 160px;
     background-color: #f5f5f5;
+    box-shadow: var(--el-box-shadow-light);
+    border: 2px dashed #e0e0e0;
 }
 .setname {
     width: 150px;
@@ -160,5 +243,8 @@ const goNewCard = () => {
 }
 .new-button {
     font-size: 26px;
+}
+.el-scrollbar {
+    text-align: left;
 }
 </style>

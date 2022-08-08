@@ -22,7 +22,8 @@ const tokenStore = useTokenStore()
 const form = reactive({
     phone: '',
     password: '',
-    remember: false
+    remember: false,
+    '@datasource': 'hikari'
 })
 
 const url =
@@ -91,7 +92,7 @@ const contentHeight = () => {
     </el-row>
 
     <el-affix position="bottom" :offset="50">
-        <p>Ⓒ 版权所有 2022</p>
+        <p>版权所有 © 2022</p>
     </el-affix>
 </template>
 

@@ -3,10 +3,10 @@ const url =
     'https://linkard.oss-cn-beijing.aliyuncs.com/251659841319_.pic.jpg'
 
 import {
-    HomeFilled,
-    Menu as IconMenu,
-    Setting,
-    Search
+    Flag,
+    CirclePlusFilled,
+    Tools,
+    Search, Menu
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -23,6 +23,10 @@ const homeVar = reactive({
 const searchAction = () => {
     router.push({ path: '/home/search-result' })
 }
+const profileItemMargin = () => {
+    return (window.innerHeight - 500) + 'px'
+}
+
 </script>
 
 <template>
@@ -44,19 +48,19 @@ const searchAction = () => {
                 :collapse="false"
             >
                 <el-menu-item index="1" route="/home/dashboard">
-                    <el-icon><HomeFilled /></el-icon>
-                    <template #title>首页</template>
+                    <el-icon><Flag /></el-icon>
+                    <template #title>学习</template>
                 </el-menu-item>
                 <el-menu-item index="2" route="/home/newcard">
-                    <el-icon><plus /></el-icon>
+                    <el-icon><CirclePlusFilled /></el-icon>
                     <template #title>创建</template>
                 </el-menu-item>
                 <el-menu-item index="3" route="/home/mycard">
-                    <el-icon><icon-menu /></el-icon>
-                    <template #title>卡片</template>
+                    <el-icon><Menu /></el-icon>
+                    <template #title>浏览</template>
                 </el-menu-item>
-                <el-menu-item index="4" route="/home/profile">
-                    <el-icon><setting /></el-icon>
+                <el-menu-item index="4" route="/home/profile" :style="{'margin-top':profileItemMargin()}">
+                    <el-icon><Tools /></el-icon>
                     <template #title>设置</template>
                 </el-menu-item>
             </el-menu>
@@ -154,7 +158,4 @@ body {
     font-size: 18px;
     margin-top: 30px;
 }
-// :root {
-// --el-menu-item-hover: var(--el-color-primary-light-9);
-// }
 </style>

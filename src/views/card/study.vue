@@ -114,7 +114,7 @@ sessionDuration(true)
                     :text-inside="true"
                     :stroke-width="5"
                     :percentage="10"
-                    status="success"
+                    status="info"
                 >
                     <span />
                 </el-progress>
@@ -129,7 +129,7 @@ sessionDuration(true)
         </el-col>
         <el-col :span="11" class="back-card">
             <el-scrollbar :style="{height:contentHeight()}">
-                <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
+                <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
             </el-scrollbar>
         </el-col>
     </el-row>
@@ -195,7 +195,7 @@ sessionDuration(true)
     //         green 66.6%
     //     );
     // background-color: #e1f5fe;
-    background: linear-gradient(#e0f7fa, #fffde7);
+    background: linear-gradient(#e1f5fe, #ffebee);
     border: 1px dashed;
     box-shadow: --el-box-shadow-dark;
     margin-top: 0;

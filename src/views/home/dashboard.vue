@@ -18,15 +18,24 @@ import {
     Edit,
     Share
 } from '@element-plus/icons-vue'
+import { reactive } from 'vue'
 
-let percentage_monday = ref(30)
+const percentage = reactive({
+    day1: 0,
+    day2: 0,
+    day3: 0,
+    day4: 0,
+    day5: 0,
+    day6: 0,
+    day7: 0
+})
 
 const colors = [
-    { color: '#f56c6c', percentage: 20 },
-    { color: '#e6a23c', percentage: 40 },
-    { color: '#5cb87a', percentage: 60 },
-    { color: '#1989fa', percentage: 80 },
-    { color: '#6f7ad3', percentage: 100 }
+    { color: '#90CAF9', percentage: 10 },
+    { color: '#64B5F6', percentage: 20 },
+    { color: '#42A5F5', percentage: 40 },
+    { color: '#2196F3', percentage: 60 },
+    { color: '#1976D2', percentage: 80 }
 ]
 
 const goStudy = () => {
@@ -50,23 +59,49 @@ const goStudy = () => {
     <el-row>
         <el-col :span="12" :offset="6">
             <div class="demo-progress">
-                <el-progress type="dashboard" width="65" :percentage="percentage_monday" :color="colors" status="success" />
-                <el-progress type="circle" width="65" :percentage="25" status="info" />
-                <el-progress type="circle" width="65" :percentage="100" status="success" />
-                <el-progress type="circle" width="65" :percentage="100" status="success" />
-                <el-progress type="circle" width="65" :percentage="100" status="success" />
-                <el-progress type="dashboard" width="65" :percentage="70" status="error" />
-                <el-progress type="circle" width="65" :percentage="50" status="exception" />
+                <el-progress type="circle" width="65" :percentage="percentage.day1" :color="colors">
+                    <span class="percentage-label">周一</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day2" :color="colors">
+                    <span class="percentage-label">周二</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day3" :color="colors">
+                    <span class="percentage-label">周三</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day4" :color="colors">
+                    <span class="percentage-label">周四</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day5" :color="colors">
+                    <span class="percentage-label">周五</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day6" :color="colors">
+                    <span class="percentage-label">周六</span>
+                </el-progress>
+                <el-progress type="circle" width="65" :percentage="percentage.day7" :color="colors">
+                    <span class="percentage-label">周日</span>
+                </el-progress>
             </div>
         </el-col>
     </el-row>
     <el-row>
         <el-col :span="12" :offset="6">
-            <el-card class="box-card">
-                <div class="text item">
-                    本次学习卡片：
+            <el-card shadow="always">
+                <template #header>
+                    <div class="card-header">
+                        <span>本次学习任务</span>
+                        <!-- <el-button class="button" text>Operation button</el-button> -->
+                    </div>
+                </template>
+                <div class="study-item">
+                    待新学习卡片：30
                 </div>
-                <div class="text item">
+                <div class="study-item">
+                    待复习卡片：120
+                </div>
+                <el-divider>
+                    <el-icon><star-filled /></el-icon>
+                </el-divider>
+                <div class="study-button">
                     <el-button type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
                 </div>
             </el-card>
@@ -85,5 +120,22 @@ const goStudy = () => {
 .demo-progress .el-progress--circle {
     margin-right: 8px;
     margin-left: 8px;
+}
+.el-card {
+    text-align: left;
+}
+.study-item {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+.study-button {
+    text-align: center;
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
 }
 </style>
