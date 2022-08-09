@@ -124,12 +124,19 @@ sessionDuration(true)
     <el-row>
         <el-col :span="11" :offset="1" :style="{height:contentHeight()}" class="front-card">
             <el-scrollbar :style="{height:contentHeight()}">
-                <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
+                <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
+                <p />
+                explains
             </el-scrollbar>
         </el-col>
         <el-col :span="11" class="back-card">
             <el-scrollbar :style="{height:contentHeight()}">
                 <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
+                <p />
+                <p><b><u>意思</u></b></p>
+                <p>
+                    <font color="red">迪斯科</font>
+                </p>
             </el-scrollbar>
         </el-col>
     </el-row>

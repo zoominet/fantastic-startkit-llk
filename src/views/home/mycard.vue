@@ -36,7 +36,9 @@ const goNewCard = () => {
 const pageData = reactive({
     sets: [],
     cards: [],
-    defaultSetId: 0
+    defaultSetId: 0,
+    cardLoading: false,
+    setLoading: false
 })
 
 const getCards = setId => {
@@ -44,6 +46,7 @@ const getCards = setId => {
     if (setId != pageData.defaultSetId) {
         pageData.defaultSetId = setId
         pageData.cards = []
+        pageData.cardLoading = true
         let querydata = {
             '[]': {
                 'Card': {
@@ -57,6 +60,7 @@ const getCards = setId => {
         api.post('get', querydata).then(res => {
             if (res.ok === true) {
                 pageData.cards = res['[]']
+                pageData.cardLoading = false
             } else {
                 ElMessage({
                     type: 'error',
@@ -76,6 +80,7 @@ const getCards = setId => {
 }
 
 const getSets = () => {
+    pageData.setLoading = true
     let querydata = {
         '[]': {
             'CardSet': {
@@ -90,6 +95,7 @@ const getSets = () => {
             pageData.sets = res['[]']
             pageData.defaultSetId = pageData.sets[0].CardSet.id
             getCards(pageData.defaultSetId)
+            pageData.setLoading = false
             // console.log(pageData.sets)
         } else {
             ElMessage({
@@ -113,11 +119,11 @@ getSets()
 
 <template>
     <el-row>
-        <el-col :span="6" :style="{height:scrollerHeight(true)}">
+        <el-col v-loading="pageData.setLoading" :span="6" :style="{height:scrollerHeight(true)}">
             <el-scrollbar>
                 <el-row>
                     <el-col>
-                        <el-button type="primary" size="large" :icon="Plus" round @click="showNewSetForm">新建卡片组</el-button>
+                        <el-button type="primary" size="large" :icon="Plus" round @click="showNewSetForm">新卡片组</el-button>
                     </el-col>
                 </el-row>
                 <el-row v-show="newSetForm.isDisplay">
@@ -147,12 +153,15 @@ getSets()
 
                 <el-row v-for="set in pageData.sets" :key="set">
                     <el-col>
-                        <el-card @click="getCards(set.CardSet.id)">
+                        <el-card :style="{'border': '1px solid #90CAF9'}" @click="getCards(set.CardSet.id)">
                             <div class="card-header">
                                 <span>{{ set.CardSet.set_name }}</span>
                                 <el-button class="button" text><el-icon><MoreFilled /></el-icon></el-button>
                             </div>
-                            <div :inline="true" class="set-item"><el-icon><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张</div>
+                            <div :inline="true" class="set-item">
+                                <el-icon><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张
+                                <el-tag v-if="set.CardSet.set_status == 1" size="small" round>学习中</el-tag>
+                            </div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -177,7 +186,7 @@ getSets()
                     </el-form>
                 </el-col>
             </el-row>
-            <el-row :style="{'margin-top':'18px'}">
+            <el-row v-loading="pageData.cardLoading" :style="{'margin-top':'18px'}">
                 <el-col>
                     <el-scrollbar :style="{height:scrollerHeight(false)}">
                         <el-space direction="horizontal" alignment="start">
@@ -208,7 +217,7 @@ getSets()
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 20px;
+    font-size: 18px;
 }
 .set-item {
     font-size: 16px;

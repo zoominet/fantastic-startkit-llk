@@ -9,6 +9,9 @@
 <script setup name="dashboard">
 // const { proxy } = getCurrentInstance()
 const router = useRouter()
+import api from '@/api'
+import { ElMessage } from 'element-plus'
+
 // const route = useRoute()
 
 import {
@@ -42,6 +45,61 @@ const goStudy = () => {
 
     router.push({ path: '/study' })
 }
+
+const pageData = reactive({
+    queueCards: [],
+    loading: false,
+    newNum: 0,
+    oldNum: 0
+})
+
+const getShouldCards = () => {
+    pageData.loading = true
+    let timestamp = Date.now()
+    // console.log(timestamp)
+    let querydata = {
+        '[]': {
+            'StudyQueue': {
+                '@role': 'OWNER',
+                'should_time{}': '<=' + timestamp
+            },
+            'Card': {
+                'id@': '/StudyQueue/card_id'
+            },
+            'count': 0
+        },
+        '@datasource': 'hikari'
+    }
+    api.post('get', querydata).then(res => {
+        if (res.ok === true) {
+            pageData.queueCards = res['[]']
+            // console.log(pageData.queueCards)
+            pageData.loading = false
+
+            for (var i = 0; i < pageData.queueCards.length; i++) {
+                if (pageData.queueCards[i].StudyQueue.study_type == 0)
+                    pageData.newNum++
+                else
+                    pageData.oldNum++
+            }
+
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+}
+getShouldCards()
 </script>
 
 <template>
@@ -85,7 +143,7 @@ const goStudy = () => {
     </el-row>
     <el-row>
         <el-col :span="12" :offset="6">
-            <el-card shadow="always">
+            <el-card v-loading="pageData.loading" shadow="always">
                 <template #header>
                     <div class="card-header">
                         <span>本次学习任务</span>
@@ -93,10 +151,10 @@ const goStudy = () => {
                     </div>
                 </template>
                 <div class="study-item">
-                    待新学习卡片：30
+                    新卡片：{{ pageData.newNum }}
                 </div>
                 <div class="study-item">
-                    待复习卡片：120
+                    复习卡片：{{ pageData.oldNum }}
                 </div>
                 <el-divider>
                     <el-icon><star-filled /></el-icon>
