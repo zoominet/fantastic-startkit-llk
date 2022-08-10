@@ -1,6 +1,6 @@
 <script setup>
 const url =
-    'https://linkard.oss-cn-beijing.aliyuncs.com/251659841319_.pic.jpg'
+    'https://linkard.oss-cn-beijing.aliyuncs.com/img/401660148927_.pic.jpg'
 
 import {
     Flag,
@@ -34,7 +34,7 @@ const profileItemMargin = () => {
         <el-aside width="100px" :class="{'left-link':'1'}">
             <el-row>
                 <el-col :span="24">
-                    <el-image style="width: 80px; height: 80px;" :src="url" :fit="fit" />
+                    <el-image style="width: 60px; height: 60px;" :src="url" :fit="fit" />
                 </el-col>
             </el-row>
             <el-row>

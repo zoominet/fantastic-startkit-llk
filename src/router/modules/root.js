@@ -5,6 +5,10 @@ export default [
         component: () => import('@/views/index.vue')
     },
     {
+        path: '/index-example',
+        component: () => import('@/views/index.vue')
+    },
+    {
         path: '/login',
         component: () => import('@/views/login.vue'),
         meta: {

@@ -27,7 +27,7 @@ const form = reactive({
 })
 
 const url =
-    'https://linkard.oss-cn-beijing.aliyuncs.com/251659841319_.pic.jpg'
+    'https://linkard.oss-cn-beijing.aliyuncs.com/img/401660148927_.pic.jpg'
 
 const onLogin = () => {
     // todo 表单校验

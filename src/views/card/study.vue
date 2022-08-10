@@ -2,15 +2,32 @@
 // const { proxy } = getCurrentInstance()
 const router = useRouter()
 // const route = useRoute()
+import api from '@/api'
+import { ElMessage } from 'element-plus'
 
 import { ArrowLeft } from '@element-plus/icons-vue'
 import moment from 'moment'
+
+import useStudyQueueStore from '@/store/modules/studyqueue'
+const queueStore = useStudyQueueStore()
 
 const goBack = () => {
     router.go(-1)
 }
 
-const lookAnswer = ref(false)
+const pageData = reactive({
+    studyQ: queueStore.getQueues(),
+    frontContent: '',
+    backContent: '',
+    loading: false,
+    lookAnswer: false,
+    studyCompleted: false,
+    studyPercentage: 0,
+    backColor: 'linear-gradient(#e1f5fe, #ffebee)'
+})
+
+// console.log(queueStore.queueCount())
+
 const timeCounter = reactive({
     beginTime: moment().format('X'),
     endTime: 0,
@@ -21,41 +38,92 @@ const timeCounter = reactive({
 const contentHeight = () => {
     return (window.innerHeight - 215) + 'px'
 }
-const lookAnswerAction = () => {
-    lookAnswer.value = true
+
+const lookQuestionAction = () => {
+    pageData.loading = true
+    pageData.lookAnswer = false
+    pageData.backColor = 'linear-gradient(#e1f5fe, #ffebee)'
+
+    let cardid = queueStore.getCardId()
+    console.log('b', cardid)
+
+    if (cardid != 0) {
+        let querydata = {
+            'Card': {
+                'id': cardid
+            },
+            '@datasource': 'hikari'
+        }
+        api.post('get', querydata).then(res => {
+            if (res.ok === true) {
+                pageData.frontContent = res['Card'].front_content
+                pageData.backContent = res['Card'].back_content
+                pageData.loading = false
+            } else {
+                ElMessage({
+                    type: 'error',
+                    showClose: true,
+                    message: res.msg
+                })
+            }
+
+        }).catch(error => {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: error
+            })
+        })
+    } else {
+        ElMessage({
+            type: 'success',
+            showClose: true,
+            message: '已经完成本次学习！'
+        })
+        pageData.frontContent = ''
+        pageData.backContent = ''
+        pageData.loading = false
+        pageData.studyCompleted = true
+    }
 }
-// const firstCardDisplay = () => {
-//     lookAnswer.value = false
-//     timeCounter.beginTime = moment().format('X')
-// }
-const labelAndNext = mLabel => {
+
+const lookAnswerAction = () => {
+    pageData.lookAnswer = true
+    pageData.backColor = ''
+
+}
+const labelAndNextAction = mLabel => {
     console.log(mLabel)
-    lookAnswer.value = false
+    pageData.lookAnswer = false
 
     timeCounter.endTime = moment().format('X')
     sessionDuration(false)
 
     timeCounter.beginTime = moment().format('X')
     sessionDuration(true)
+
+    lookQuestionAction()
 }
 
 document.onkeydown = function() {
     let key = window.event.keyCode
-    if (lookAnswer.value == false) {
-        if (key == 32 || key == 13) {
-            lookAnswerAction()
-        } else {
+    if (pageData.studyCompleted == false) {
+        if (pageData.lookAnswer == false) {
+            if (key == 32 || key == 13) {
+                lookAnswerAction()
+            } else {
             // nothing
-        }
-    } else {
-        if (key == 32 || key == 13 || key == 51) {
-            labelAndNext(3)
-        } else if (key == 49) {
-            labelAndNext(1)
-        } else if (key == 50) {
-            labelAndNext(2)
+            }
         } else {
+            if (key == 32 || key == 13 || key == 51) {
+                labelAndNextAction(3)
+            } else if (key == 49) {
+                labelAndNextAction(1)
+            } else if (key == 50) {
+                labelAndNextAction(2)
+            } else {
             // nothing
+            }
         }
     }
 }
@@ -103,17 +171,19 @@ const formateSeconds = endTime => {
 }
 
 sessionDuration(true)
+
+lookQuestionAction()
 </script>
 
 <template>
     <el-page-header :icon="ArrowLeft" title="" content=" " @back="goBack" />
     <el-row>
         <el-col :span="24">
-            <div class="demo-progress">
+            <div class="study-progress">
                 <el-progress
                     :text-inside="true"
                     :stroke-width="5"
-                    :percentage="10"
+                    :percentage="pageData.studyPercentage"
                     status="info"
                 >
                     <span />
@@ -121,33 +191,31 @@ sessionDuration(true)
             </div>
         </el-col>
     </el-row>
-    <el-row>
+    <el-row v-loading="pageData.loading">
         <el-col :span="11" :offset="1" :style="{height:contentHeight()}" class="front-card">
-            <el-scrollbar :style="{height:contentHeight()}">
+            <el-scrollbar :style="{height:contentHeight(),'padding-left':'10px','padding-right':'10px'}">
                 <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
                 <p />
-                explains
+                {{ pageData.frontContent }}
             </el-scrollbar>
         </el-col>
-        <el-col :span="11" class="back-card">
-            <el-scrollbar :style="{height:contentHeight()}">
+        <el-col :span="11" class="back-card" :style="{'background':pageData.backColor}">
+            <el-scrollbar :style="{height:contentHeight(),'padding-left':'20px','padding-right':'10px'}">
                 <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
-                <p />
-                <p><b><u>意思</u></b></p>
-                <p>
-                    <font color="red">迪斯科</font>
-                </p>
+                <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
+                    <div v-html="pageData.backContent" />
+                </div>
             </el-scrollbar>
         </el-col>
     </el-row>
-    <el-row :style="{'background-color':'#FAFAFA','margin-right':'-5px','margin-left':'-5px'}">
+    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FAFAFA','margin-right':'-5px','margin-left':'-5px'}">
         <el-col :span="16 " :offset="4" :style="{height:'60px'}">
-            <el-button v-show="!lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面</el-button>
+            <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面</el-button>
 
-            <div v-show="lookAnswer">
-                <el-button type="danger" round @click="labelAndNext(1)">困难</el-button>
-                <el-button type="warning" round @click="labelAndNext(2)">良好</el-button>
-                <el-button type="success" round @click="labelAndNext(3)">简单</el-button>
+            <div v-show="pageData.lookAnswer">
+                <el-button type="danger" round @click="labelAndNextAction(1)">困难</el-button>
+                <el-button type="warning" round @click="labelAndNextAction(2)">良好</el-button>
+                <el-button type="success" round @click="labelAndNextAction(3)">简单</el-button>
             </div>
             <!-- <div
             ><kbd class="DocSearch-Button-Key">1</kbd></div> -->
@@ -173,7 +241,7 @@ sessionDuration(true)
     border-radius: 4px;
     margin-top: 20px;
 }
-.demo-progress .el-progress--line {
+.study-progress .el-progress--line {
     margin-bottom: 15px;
     width: 100%;
 }
@@ -202,8 +270,8 @@ sessionDuration(true)
     //         green 66.6%
     //     );
     // background-color: #e1f5fe;
-    background: linear-gradient(#e1f5fe, #ffebee);
-    border: 1px dashed;
+    // background: linear-gradient(#e1f5fe, #ffebee);
+    border: 1px solid;
     box-shadow: --el-box-shadow-dark;
     margin-top: 0;
     margin-bottom: 20px;
@@ -214,5 +282,8 @@ sessionDuration(true)
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 30px;
+}
+div p {
+    text-align: center;
 }
 </style>

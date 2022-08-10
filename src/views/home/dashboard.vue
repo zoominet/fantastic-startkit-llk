@@ -46,6 +46,9 @@ const goStudy = () => {
     router.push({ path: '/study' })
 }
 
+import useStudyQueueStore from '@/store/modules/studyqueue'
+const queueStore = useStudyQueueStore()
+
 const pageData = reactive({
     queueCards: [],
     loading: false,
@@ -63,9 +66,9 @@ const getShouldCards = () => {
                 '@role': 'OWNER',
                 'should_time{}': '<=' + timestamp
             },
-            'Card': {
-                'id@': '/StudyQueue/card_id'
-            },
+            // 'Card': {
+            //     'id@': '/StudyQueue/card_id'
+            // },
             'count': 0
         },
         '@datasource': 'hikari'
@@ -74,6 +77,7 @@ const getShouldCards = () => {
         if (res.ok === true) {
             pageData.queueCards = res['[]']
             // console.log(pageData.queueCards)
+            queueStore.setQueues(pageData.queueCards)
             pageData.loading = false
 
             for (var i = 0; i < pageData.queueCards.length; i++) {
@@ -100,6 +104,7 @@ const getShouldCards = () => {
     })
 }
 getShouldCards()
+
 </script>
 
 <template>
