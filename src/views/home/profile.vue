@@ -1,6 +1,9 @@
 <script setup name="HomeNewcard">
 // const { proxy } = getCurrentInstance()
 
+const url =
+    'https://linkard.oss-cn-beijing.aliyuncs.com/img/401660148927_.pic.jpg'
+
 const router = useRouter()
 const route = useRoute()
 
@@ -33,7 +36,18 @@ const tabPosition = ref('left')
             <el-tabs :tab-position="tabPosition" style="height: 300px;" class="demo-tabs">
                 <el-tab-pane label="我">个人信息[WIP]</el-tab-pane>
                 <el-tab-pane label="设置">系统设置[WIP]</el-tab-pane>
-                <el-tab-pane label="关于">帮助每个人找到自己的记忆曲线，提高记忆效率和学习效果</el-tab-pane>
+                <el-tab-pane label="关于">
+                    <el-row>
+                        <el-col :span="24">
+                            <el-image style="width: 80px; height: 80px;" :src="url" :fit="fit" />
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            帮助每个人找到自己的记忆曲线，提高记忆效率和学习效果
+                        </el-col>
+                    </el-row>
+                </el-tab-pane>
                 <el-tab-pane label="退出"><el-link @click="onLogout">注销</el-link></el-tab-pane>
             </el-tabs>
         </el-col>
@@ -45,7 +59,7 @@ const tabPosition = ref('left')
     font-size: 32px;
 }
 .demo-tabs {
-    padding-top: 100px;
+    padding-top: 80px;
 }
 .demo-tabs > .el-tabs__content {
     padding: 32px;
@@ -63,7 +77,6 @@ const tabPosition = ref('left')
     font-size: 16px;
 }
 .el-tab-pane {
-    margin-top: 80px;
-    margin-left: 50px;
+    margin: 30px;
 }
 </style>

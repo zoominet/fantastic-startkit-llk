@@ -6,7 +6,8 @@ const useStudyQueueStore = defineStore(
     {
         state: () => ({
             queue: [],
-            idx: 0
+            idx: -1,
+            today: ''
         }),
         getters: {
             queueCount: state => {
@@ -16,19 +17,31 @@ const useStudyQueueStore = defineStore(
         actions: {
             setQueues(q) {
                 this.queue = q
-                this.idx = 0
+                this.idx = -1
             },
             getQueues() {
                 return this.queue
             },
+            addQueue(sq) {
+                this.queue[this.queue.length] = { 'StudyQueue': sq }
+            },
             getCardId() {
-                let i = this.idx
+                let i = ++this.idx
                 if (i < this.queue.length) {
-                    this.idx++
                     return this.queue[i].StudyQueue.card_id
                 } else
                     return 0
+            },
+            getStudyQueue() {
+                return this.queue[this.idx].StudyQueue
+            },
+            setToday(t) {
+                this.today = t
+            },
+            getToday() {
+                return this.today
             }
+
         }
     }
 )

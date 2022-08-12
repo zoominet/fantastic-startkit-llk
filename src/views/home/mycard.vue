@@ -53,7 +53,7 @@ const getCards = setId => {
                     'set_id': setId,
                     '@order': 'id'
                 },
-                'count': 0
+                'count': 100
             },
             '@datasource': 'hikari'
         }

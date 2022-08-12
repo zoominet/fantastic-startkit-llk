@@ -23,14 +23,18 @@ const pageData = reactive({
     lookAnswer: false,
     studyCompleted: false,
     studyPercentage: 0,
-    backColor: 'linear-gradient(#e1f5fe, #ffebee)'
+    studyCount: 0,
+    backColor: 'linear-gradient(#B3E5FC, #E8F5E9)'
 })
+
+const queueCount = computed(() => queueStore.queueCount)
 
 // console.log(queueStore.queueCount())
 
 const timeCounter = reactive({
     beginTime: moment().format('X'),
     endTime: 0,
+    seconds: 0,
     strTime: '',
     timer: null
 })
@@ -42,10 +46,10 @@ const contentHeight = () => {
 const lookQuestionAction = () => {
     pageData.loading = true
     pageData.lookAnswer = false
-    pageData.backColor = 'linear-gradient(#e1f5fe, #ffebee)'
+    pageData.backColor = 'linear-gradient(#B3E5FC, #E8F5E9)'
 
     let cardid = queueStore.getCardId()
-    console.log('b', cardid)
+    // console.log('b', cardid)
 
     if (cardid != 0) {
         let querydata = {
@@ -92,17 +96,145 @@ const lookAnswerAction = () => {
     pageData.backColor = ''
 
 }
-const labelAndNextAction = mLabel => {
-    console.log(mLabel)
-    pageData.lookAnswer = false
 
+const getCurrentDatetime = () => {
+    const date = new Date(+new Date() + 8 * 3600 * 1000)
+    const str = date.toISOString().slice(0, 19).replace('T', ' ')
+    // console.log('ctime', str)
+    return str
+}
+
+const labelAndNextAction = mLabel => {
+    // console.log(mLabel)
+    pageData.loading = true
+    pageData.lookAnswer = false
     timeCounter.endTime = moment().format('X')
     sessionDuration(false)
 
-    timeCounter.beginTime = moment().format('X')
-    sessionDuration(true)
+    let currentSQueue = queueStore.getStudyQueue()
+    let currentTime = Date.now()
+    let shouldTime = currentTime + 5 * 60 * 1000
+    if (mLabel == 1 || mLabel == 2) {
+        queueStore.addQueue(currentSQueue)
+    }
+
+    // 设置学习标签
+    let querydata = {
+        'StudyQueue': {
+            'id': currentSQueue.id,
+            'should_time': shouldTime,
+            'study_first_time': getCurrentDatetime(),
+            'update_time': getCurrentDatetime(),
+            'update_by': currentSQueue.userId,
+            'study_type': 1,
+            'study_cycle': 1
+        },
+        'tag': 'StudyQueue',
+        '@datasource': 'hikari'
+    }
+    // 8轮复习
+    if (currentSQueue.study_type == 1) {
+        switch (currentSQueue.study_cycle) {
+            case 1:
+                shouldTime = currentTime + 25 * 60 * 1000 // 30分钟
+                break
+            case 2:
+                shouldTime = currentTime + 9.5 * 60 * 60 * 1000 // 10小时
+                break
+            case 3:
+                shouldTime = currentTime + 14 * 60 * 60 * 1000 // 1天
+                break
+            case 4:
+                shouldTime = currentTime + 38 * 60 * 60 * 1000 // 2天
+                break
+            case 5:
+                shouldTime = currentTime + 86 * 60 * 60 * 1000 // 4天
+                break
+            case 6:
+                shouldTime = currentTime + 158 * 60 * 60 * 1000 // 7天
+                break
+            case 7:
+                shouldTime = currentTime + 350 * 60 * 60 * 1000 // 15天
+                break
+            default:
+                shouldTime = currentTime + 30 * 24 * 60 * 60 * 1000 // 1个月
+                break
+        }
+
+        querydata = {
+            'StudyQueue': {
+                'id': currentSQueue.id,
+                'should_time': shouldTime,
+                'study_last_time': getCurrentDatetime(),
+                'update_time': getCurrentDatetime(),
+                'update_by': currentSQueue.userId,
+                'study_cycle': currentSQueue.study_cycle + 1
+            },
+            'tag': 'StudyQueue',
+            '@datasource': 'hikari'
+        }
+    }
+    api.post('put', querydata).then(res => {
+        if (res.ok === true) {
+            let recorddata = {
+                'StudyRecord': {
+                    'queue_id': currentSQueue.id,
+                    'study_time': getCurrentDatetime(),
+                    'create_time': getCurrentDatetime(),
+                    'create_by': currentSQueue.userId,
+                    'key_score': mLabel,
+                    'seconds': timeCounter.seconds,
+                    'study_cycle': currentSQueue.study_type == 1 ? currentSQueue.study_cycle + 1 : 1,
+                    '@role': 'OWNER'
+                },
+                'tag': 'StudyRecord',
+                '@datasource': 'hikari'
+            }
+            api.post('post', recorddata).then(res => {
+                if (res.ok === true) {
+                    pageData.loading = false
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        showClose: true,
+                        message: res.msg
+                    })
+                }
+
+            }).catch(error => {
+                ElMessage({
+                    type: 'error',
+                    showClose: true,
+                    message: error
+                })
+            })
+
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+
+    pageData.studyCount++
+    // console.log('studyCount', pageData.studyCount)
+    // console.log('queueCount', queueCount.value)
+
+    pageData.studyPercentage = 100 * pageData.studyCount / queueCount.value
+    // console.log('studyPercentage', pageData.studyPercentage)
 
     lookQuestionAction()
+    timeCounter.beginTime = moment().format('X')
+    sessionDuration(true)
 }
 
 document.onkeydown = function() {
@@ -134,12 +266,15 @@ const sessionDuration = isBegin => {
     if (isBegin == true) {
         timeCounter.timer = setInterval(() => {
             let date = moment().format('X') - timeCounter.beginTime
-            timeCounter.strTime = formateSeconds(date)
+            // timeCounter.strTime = formateSeconds(date)
             // console.log(timeCounter.strTime)
         }, 1000)
     } else {
         let date = timeCounter.endTime - timeCounter.beginTime
-        timeCounter.strTime = formateSeconds(date)
+        if (date > 60)
+            date = 60
+        timeCounter.seconds = date
+        // timeCounter.strTime = formateSeconds(date)
     }
 }
 // 将秒转化为时分秒
@@ -210,12 +345,12 @@ lookQuestionAction()
     </el-row>
     <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FAFAFA','margin-right':'-5px','margin-left':'-5px'}">
         <el-col :span="16 " :offset="4" :style="{height:'60px'}">
-            <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面</el-button>
+            <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
 
             <div v-show="pageData.lookAnswer">
-                <el-button type="danger" round @click="labelAndNextAction(1)">困难</el-button>
-                <el-button type="warning" round @click="labelAndNextAction(2)">良好</el-button>
-                <el-button type="success" round @click="labelAndNextAction(3)">简单</el-button>
+                <el-button type="danger" round @click="labelAndNextAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
+                <el-button type="warning" round @click="labelAndNextAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
+                <el-button type="success" round @click="labelAndNextAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
             </div>
             <!-- <div
             ><kbd class="DocSearch-Button-Key">1</kbd></div> -->
@@ -245,9 +380,10 @@ lookQuestionAction()
     margin-bottom: 15px;
     width: 100%;
 }
-.DocSearch-Button-Key {
+.Num-Button-Key {
     align-items: center;
-    background: rgb(125 125 125 / 10%);
+    // background: rgb(125 125 125 / 10%);
+    background-color: #e8e8f1;
     border-radius: 3px;
     box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgb(30 35 90 / 40%);
     color: #909399;
@@ -258,8 +394,25 @@ lookQuestionAction()
     // padding: 0 0 2px;
     border: 0;
     // top: -1px;
-    width: 30px;
-    height: 26px;
+    width: 25px;
+    height: 20px;
+}
+.Space-Button-Key {
+    align-items: center;
+    // background: rgb(125 125 125 / 10%);
+    background-color: #e8e8f1;
+    border-radius: 3px;
+    box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgb(30 35 90 / 40%);
+    color: #909399;
+    display: flex;
+    justify-content: center;
+    margin-right: 0.4em;
+    position: relative;
+    // padding: 0 0 2px;
+    border: 0;
+    // top: -1px;
+    width: 80px;
+    height: 20px;
 }
 .back-card {
     // background:
@@ -276,6 +429,8 @@ lookQuestionAction()
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 20px;
+    background-size: cover;
+    background-attachment: fixed;
 }
 .front-card {
     border: 1px solid;
