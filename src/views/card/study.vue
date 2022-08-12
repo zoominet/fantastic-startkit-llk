@@ -107,7 +107,7 @@ const labelAndNextAction = mLabel => {
 
 document.onkeydown = function() {
     let key = window.event.keyCode
-    if (pageData.studyCompleted == false) {
+    if (pageData.studyCompleted == false && pageData.loading == false) {
         if (pageData.lookAnswer == false) {
             if (key == 32 || key == 13) {
                 lookAnswerAction()
