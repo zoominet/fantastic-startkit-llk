@@ -34,7 +34,9 @@ const tabPosition = ref('left')
     <el-row>
         <el-col :span="8" :offset="8">
             <el-tabs :tab-position="tabPosition" style="height: 300px;" class="demo-tabs">
-                <el-tab-pane label="我">个人信息[WIP]</el-tab-pane>
+                <el-tab-pane label="我">
+                    个人信息[{{ tokenStore.getLoginUser().name }}]
+                </el-tab-pane>
                 <el-tab-pane label="设置">系统设置[WIP]</el-tab-pane>
                 <el-tab-pane label="关于">
                     <el-row>

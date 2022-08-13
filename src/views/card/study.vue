@@ -185,6 +185,7 @@ const labelAndNextAction = mLabel => {
                     'key_score': mLabel,
                     'seconds': timeCounter.seconds,
                     'study_cycle': currentSQueue.study_type == 1 ? currentSQueue.study_cycle + 1 : 1,
+                    'study_day': queueStore.getToday(),
                     '@role': 'OWNER'
                 },
                 'tag': 'StudyRecord',
