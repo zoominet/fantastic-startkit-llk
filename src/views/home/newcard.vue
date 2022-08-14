@@ -36,7 +36,7 @@ const contentHeight = () => {
 
 <template>
     <el-row class="firstline">
-        <el-col :span="14" :style="{'text-align':'left'}">
+        <el-col :span="18" :style="{'text-align':'left'}">
             <el-form :inline="true" size="mini" :model="cardForm">
                 <el-form-item label="">
                     <el-select v-model="cardForm.setid" placeholder="">
@@ -51,7 +51,7 @@ const contentHeight = () => {
                 </el-form-item>
             </el-form>
         </el-col>
-        <el-col :span="10" :style="{'text-align':'right'}">
+        <el-col :span="6" :style="{'text-align':'right'}">
             <el-form :inline="true" size="mini">
                 <el-button type="primary" @click="onSubmit">新增</el-button>
                 <el-button type="primary" @click="onSubmit">新增&继续</el-button>

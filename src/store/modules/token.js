@@ -21,6 +21,10 @@ const useTokenStore = defineStore(
                 }
                 return retn
             }
+            // ,
+            // lu: state => {
+            //     return state.loginUser
+            // }
         },
         actions: {
             // login() {

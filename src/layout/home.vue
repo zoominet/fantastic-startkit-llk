@@ -24,7 +24,10 @@ const searchAction = () => {
     router.push({ path: '/home/search-result' })
 }
 const profileItemMargin = () => {
-    return (window.innerHeight - 500) + 'px'
+    let h = (window.innerHeight - 500)
+    if (h < 30)
+        return '30px'
+    return h + 'px'
 }
 
 </script>
@@ -117,6 +120,9 @@ const profileItemMargin = () => {
 <style lang="scss">
 body {
     background-color: #fff;
+}
+.el-container {
+    min-height: 700px;
 }
 .el-row {
     margin: 10px;

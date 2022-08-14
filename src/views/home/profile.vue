@@ -28,14 +28,29 @@ const onLogout = () => {
 import { ref } from 'vue'
 
 const tabPosition = ref('left')
+
+const pageData = reactive({
+    lu: {},
+    uname: ''
+})
+
+const initProfile = () => {
+
+    pageData.lu = tokenStore.getLoginUser()
+    console.log(pageData.lu)
+    if (pageData.lu) {
+        pageData.uname = pageData.lu.name
+    }
+}
+initProfile()
 </script>
 
 <template>
     <el-row>
-        <el-col :span="8" :offset="8">
+        <el-col :span="12" :offset="4">
             <el-tabs :tab-position="tabPosition" style="height: 300px;" class="demo-tabs">
                 <el-tab-pane label="我">
-                    个人信息[{{ tokenStore.getLoginUser().name }}]
+                    个人信息[{{ pageData.uname }}]
                 </el-tab-pane>
                 <el-tab-pane label="设置">系统设置[WIP]</el-tab-pane>
                 <el-tab-pane label="关于">
@@ -50,7 +65,7 @@ const tabPosition = ref('left')
                         </el-col>
                     </el-row>
                 </el-tab-pane>
-                <el-tab-pane label="退出"><el-link @click="onLogout">注销</el-link></el-tab-pane>
+                <el-tab-pane label="退出"><el-link @click="onLogout">退出</el-link></el-tab-pane>
             </el-tabs>
         </el-col>
     </el-row>

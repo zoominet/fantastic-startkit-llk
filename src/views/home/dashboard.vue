@@ -56,6 +56,9 @@ const getShouldCards = () => {
     pageData.loading = true
     pageData.newNum = 0
     pageData.oldNum = 0
+    pageData.queueCards = []
+    dayboard.shouldNum = 0
+    dayboard.cycleday = [0, 0, 0, 0, 0, 0, 0, 0]
     let timestamp = Date.now()
     // timestamp += 30 * 60 * 1000 // 查询后续半小时以内需要学习的卡片
     // console.log(timestamp)
@@ -63,8 +66,8 @@ const getShouldCards = () => {
         '[]': {
             'StudyQueue': {
                 '@role': 'OWNER',
-                'should_time{}': '<=' + timestamp,
-                '@order': 'study_type,id'
+                // 'should_time{}': '<=' + timestamp,
+                '@order': 'id'
             },
             // 'Card': {
             //     'id@': '/StudyQueue/card_id'
@@ -74,22 +77,16 @@ const getShouldCards = () => {
         '@datasource': 'hikari'
     }
     api.post('get', querydata).then(res => {
-        dayboard.shouldNum = 0
-        dayboard.cycleday = [0, 0, 0, 0, 0, 0, 0, 0]
 
+        // console.log(res)
         if (res.ok === true) {
-            pageData.queueCards = res['[]']
-            // console.log(pageData.queueCards)
-            if (pageData.queueCards) {
-
-                queueStore.setQueues(pageData.queueCards)
-                for (var i = 0; i < pageData.queueCards.length; i++) {
-                    if (pageData.queueCards[i].StudyQueue.study_type == 0)
-                        pageData.newNum++
-                    else
-                        pageData.oldNum++
-
-                    switch (pageData.queueCards[i].StudyQueue.study_cycle) {
+            if (res['[]']) {
+                let allQueueCards = res['[]']
+                for (var i = 0; i < allQueueCards.length; i++) {
+                    if (allQueueCards[i].StudyQueue.should_time <= timestamp) {
+                        pageData.queueCards[pageData.queueCards.length] = allQueueCards[i]
+                    }
+                    switch (allQueueCards[i].StudyQueue.study_cycle) {
                         case 0:
                             dayboard.cycleday[0]++
                             break
@@ -118,11 +115,23 @@ const getShouldCards = () => {
                             dayboard.cycleElse++
                             break
                     }
+                    // 计算今天的应该学习总量
+                    dayboard.shouldNum = dayboard.cycleday[0] * 4 + dayboard.cycleday[1] * 3 + dayboard.cycleday[2] * 2 + dayboard.cycleday[3] + dayboard.cycleday[4] + dayboard.cycleday[5] + dayboard.cycleday[6] + dayboard.cycleday[7] + dayboard.cycleElse
                 }
-                // 计算今天的应该学习总量
-                dayboard.shouldNum = dayboard.cycleday[0] * 4 + dayboard.cycleday[1] * 3 + dayboard.cycleday[2] * 2 + dayboard.cycleday[3] + dayboard.cycleday[4] + dayboard.cycleday[5] + dayboard.cycleday[6] + dayboard.cycleday[7] + dayboard.cycleElse
                 initWeekData()
+
+                // pageData.queueCards = res['[]']
+                // console.log(pageData.queueCards)
+                queueStore.setQueues(pageData.queueCards)
+                for (var j = 0; j < pageData.queueCards.length; j++) {
+                    if (pageData.queueCards[j].StudyQueue.study_type == 0)
+                        pageData.newNum++
+                    else
+                        pageData.oldNum++
+                }
+
             }
+
             pageData.loading = false
         } else {
             ElMessage({
@@ -158,11 +167,12 @@ const getWeekData = () => {
     let today = new Date()
     // 获取今天星期几
     let whatDay = today.getDay()
-    // whatDay = whatDay != 0 ? whatDay : 7;
+    // console.log('whatDay', whatDay, weekboard.week)
+    whatDay = whatDay != 0 ? whatDay : 7
     // 星期一到星期天，如果以星期天开头 循环0-6
     for (let i = 1; i < 8; i++) {
         let dayIdx = i - whatDay + weekboard.week
-        // console.log('dayIdx', dayIdx)
+        console.log('dayIdx', dayIdx)
         let weeekRes = getWeek(dayIdx).split('|')
         data.push(weeekRes[0])
         weekboard.weekStr[i - 1] = weeekRes[1]
@@ -367,7 +377,8 @@ const goStudy = () => {
 
 <template>
     <el-row>
-        <el-col :span="12" :offset="6">
+        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :sm="20" :md="16" :lg="12">
             <el-button-group>
                 <el-button type="default" :icon="ArrowLeft" @click="handleGetPrevWeek" />
                 <el-button type="default" :style="{'width':'400px','font-size':'18px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
@@ -376,9 +387,11 @@ const goStudy = () => {
                 </el-button>
             </el-button-group>
         </el-col>
+        <el-col :sm="2" :md="4" :lg="6" />
     </el-row>
     <el-row>
-        <el-col :span="12" :offset="6">
+        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :sm="20" :md="16" :lg="12">
             <div class="demo-progress">
                 <el-progress v-for="i in 7" :key="i" type="circle" width="65" :percentage="weekboard.dayPercentage[i-1]" :color="colors">
                     <span class="percentage-label" v-html="weekboard.weekStr[i-1]" />
@@ -403,9 +416,11 @@ const goStudy = () => {
                 </el-progress> -->
             </div>
         </el-col>
+        <el-col :sm="2" :md="4" :lg="6" />
     </el-row>
     <el-row>
-        <el-col :span="12" :offset="6">
+        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :sm="20" :md="16" :lg="12">
             <el-card v-loading="pageData.loading" shadow="always">
                 <template #header>
                     <div class="card-header">
@@ -427,6 +442,7 @@ const goStudy = () => {
                 </div>
             </el-card>
         </el-col>
+        <el-col :sm="2" :md="4" :lg="6" />
     </el-row>
 </template>
 
@@ -439,8 +455,8 @@ const goStudy = () => {
     margin-bottom: 15px;
 }
 .demo-progress .el-progress--circle {
-    margin-right: 8px;
-    margin-left: 8px;
+    margin-right: 5px;
+    margin-left: 5px;
 }
 .el-card {
     text-align: left;

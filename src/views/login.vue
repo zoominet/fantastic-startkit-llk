@@ -63,12 +63,12 @@ const contentHeight = () => {
         <el-col :span="24" :style="{height:'80px'}" />
     </el-row>
     <el-row>
-        <el-col :span="9" :style="{height:contentHeight()}"><div class="grid-content ep-bg-purple" /></el-col>
-        <el-col :span="6">
+        <el-col :sm="6" :md="8" :lg="10" />
+        <el-col :sm="12" :md="8" :lg="4" :style="{height:contentHeight()}">
             <el-image style="width: 120px; height: 120px;" :src="url" :fit="fit" />
-            <h2>登录</h2>
+            <h2 />
 
-            <el-form :model="form" size="large" label-width="120px">
+            <el-form :model="form" size="large" label-width="60px">
                 <el-form-item label="手机号">
                     <el-input v-model="form.phone" />
                 </el-form-item>
@@ -82,18 +82,19 @@ const contentHeight = () => {
                 <el-form-item label="">
                     <el-checkbox v-model="form.remember" label="记住我" />
                 </el-form-item>
-                <el-form-item>
+                <!-- <el-form-item>
                     <el-button type="primary" :icon="User" :style="{'width': '100%'}" @click="onLogin">登录</el-button>
-                <!-- <el-link :class="{reglink:true}">注册</el-link> -->
-                </el-form-item>
+                    <el-link :class="{reglink:true}">注册</el-link>
+                </el-form-item> -->
             </el-form>
+            <el-button type="primary" :icon="User" :style="{'width': '100%'}" @click="onLogin">登录</el-button>
         </el-col>
-        <el-col :span="9"><div class="grid-content ep-bg-purple" /></el-col>
+        <el-col :sm="6" :md="8" :lg="10" />
     </el-row>
 
-    <el-affix position="bottom" :offset="50">
+    <!-- <el-affix position="bottom" :offset="50">
         <p>版权所有 © 2022</p>
-    </el-affix>
+    </el-affix> -->
 </template>
 
 <style lang="scss">
