@@ -37,18 +37,19 @@ const onLogin = () => {
             type: 'success',
             message: '欢迎使用'
         })
+        router.push({ path: '/' })
         // 登录成功后路由跳回
-        if (route.query.redirect) {
-            router.replace({
-                path: route.query.redirect
-            })
-        } else {
-            if (window.history.length <= 1) {
-                router.push({ path: '/' })
-            } else {
-                router.go(-1)
-            }
-        }
+        // if (route.query.redirect) {
+        //     router.replace({
+        //         path: route.query.redirect
+        //     })
+        // } else {
+        //     if (window.history.length <= 1) {
+        //         router.push({ path: '/' })
+        //     } else {
+        //         router.go(-1)
+        //     }
+        // }
     })
 
 }
