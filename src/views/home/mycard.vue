@@ -27,7 +27,7 @@ const scrollerHeight = left => {
     if (left)
         return (window.innerHeight - 80) + 'px'
     else
-        return (window.innerHeight - 142) + 'px'
+        return (window.innerHeight - 175) + 'px'
 }
 const goNewCard = () => {
     router.push({ path: '/home/newcard' })
@@ -38,7 +38,8 @@ const pageData = reactive({
     cards: [],
     defaultSetId: 0,
     cardLoading: false,
-    setLoading: false
+    setLoading: false,
+    cardCount: 0
 })
 
 const getCards = setId => {
@@ -153,14 +154,26 @@ getSets()
 
                 <el-row v-for="set in pageData.sets" :key="set">
                     <el-col>
-                        <el-card :style="{'border': '1px solid #90CAF9'}" @click="getCards(set.CardSet.id)">
+                        <el-card :style="{'border': '1px solid var(--el-color-primary)'}" @click="getCards(set.CardSet.id)">
                             <div class="card-header">
                                 <span>{{ set.CardSet.set_name }}</span>
-                                <el-button class="button" text><el-icon><MoreFilled /></el-icon></el-button>
+                                <!-- <el-button class="button" size="mini" text><el-icon><MoreFilled /></el-icon></el-button> -->
+                                <el-dropdown size="small">
+                                    <el-icon color="var(--el-color-primary)"><MoreFilled /></el-icon>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <el-dropdown-item v-if="set.CardSet.set_status==0&&set.CardSet.card_num>0">开始学习</el-dropdown-item>
+                                            <el-dropdown-item v-if="set.CardSet.set_status==1">修改学习计划</el-dropdown-item>
+                                            <el-dropdown-item>重命名</el-dropdown-item>
+                                            <el-dropdown-item>分享</el-dropdown-item>
+                                            <el-dropdown-item>删除</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
                             </div>
                             <div :inline="true" class="set-item">
-                                <el-icon><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张
-                                <el-tag v-if="set.CardSet.set_status == 1" size="small" round>学习中</el-tag>
+                                <el-icon color="var(--el-color-primary)"><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张
+                                <el-tag v-if="set.CardSet.set_status == 1" type="success" size="small" round>学习中</el-tag>
                             </div>
                         </el-card>
                     </el-col>
@@ -199,13 +212,27 @@ getSets()
                                     </div>
                                 </el-card>
                                 <el-card v-for="card in pageData.cards" :key="card" class="box-card">
+                                    <div class="card-header">
+                                        <span />
+                                        <el-dropdown size="small">
+                                            <el-icon color="var(--el-color-info-light-5)"><MoreFilled /></el-icon>
+                                            <template #dropdown>
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item>加入学习</el-dropdown-item>
+                                                    <el-dropdown-item>编辑</el-dropdown-item>
+                                                    <el-dropdown-item>删除</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </div>
                                     <div class="card-item">
-                                        {{ card.Card.front_content }}
+                                        <div v-html="card.Card.front_content" />
                                     </div>
                                 </el-card>
                             </el-space>
                         </el-space>
                     </el-scrollbar>
+                    <el-pagination background layout="prev, pager, next" :total="pageData.cardCount" :page-size="100" />
                 </el-col>
             </el-row>
         </el-col>
@@ -236,7 +263,7 @@ getSets()
 .new-card {
     width: 130px;
     height: 160px;
-    background-color: #f5f5f5;
+    background-color: #fafafa;
     box-shadow: var(--el-box-shadow-light);
     border: 2px dashed #e0e0e0;
 }
@@ -255,5 +282,8 @@ getSets()
 }
 .el-scrollbar {
     text-align: left;
+}
+.el-pagination {
+    padding: 5px 10px;
 }
 </style>

@@ -101,7 +101,7 @@ const profileItemMargin = () => {
                     <el-col :span="6" :offset="9">
                         <el-input
                             v-model="homeVar.gSearchValue"
-                            placeholder="搜索卡片"
+                            placeholder="搜索"
                             class="input-with-select"
                             @keydown.enter="searchAction"
                         >

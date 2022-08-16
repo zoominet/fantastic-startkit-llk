@@ -43,7 +43,9 @@ const pageData = reactive({
     queueCards: [],
     loading: false,
     newNum: 0,
-    oldNum: 0
+    newNumType: 'success',
+    oldNum: 0,
+    oldNumType: 'success'
 })
 
 const dayboard = reactive({
@@ -55,7 +57,9 @@ const dayboard = reactive({
 const getShouldCards = () => {
     pageData.loading = true
     pageData.newNum = 0
+    pageData.newNumType = 'success',
     pageData.oldNum = 0
+    pageData.oldNumType = 'success'
     pageData.queueCards = []
     dayboard.shouldNum = 0
     dayboard.cycleday = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -131,7 +135,10 @@ const getShouldCards = () => {
                 }
 
             }
-
+            if (pageData.newNum > 0)
+                pageData.newNumType = ''
+            if (pageData.oldNum > 0)
+                pageData.oldNumType = ''
             pageData.loading = false
         } else {
             ElMessage({
@@ -172,13 +179,13 @@ const getWeekData = () => {
     // 星期一到星期天，如果以星期天开头 循环0-6
     for (let i = 1; i < 8; i++) {
         let dayIdx = i - whatDay + weekboard.week
-        console.log('dayIdx', dayIdx)
+        // console.log('dayIdx', dayIdx)
         let weeekRes = getWeek(dayIdx).split('|')
         data.push(weeekRes[0])
         weekboard.weekStr[i - 1] = weeekRes[1]
         if (dayIdx == 0) {
             queueStore.setToday(weeekRes[0])
-            weekboard.weekStr[i - 1] = '<font color=red>' + weeekRes[1] + '</font>'
+            weekboard.weekStr[i - 1] = '<b>' + weeekRes[1] + '</b>'
 
             // 查询已经学了多少张卡片
             api.post('get', {
@@ -419,8 +426,8 @@ const goStudy = () => {
         <el-col :sm="2" :md="4" :lg="6" />
     </el-row>
     <el-row>
-        <el-col :sm="2" :md="4" :lg="6" />
-        <el-col :sm="20" :md="16" :lg="12">
+        <el-col :sm="4" :md="6" :lg="8" />
+        <el-col :sm="16" :md="12" :lg="8">
             <el-card v-loading="pageData.loading" shadow="always">
                 <template #header>
                     <div class="card-header">
@@ -428,21 +435,28 @@ const goStudy = () => {
                         <el-button size="mini" :icon="Refresh" circle @click="getShouldCards" />
                     </div>
                 </template>
-                <div class="study-item">
+                <!-- <div class="study-item">
                     新卡片：{{ pageData.newNum }}
                 </div>
                 <div class="study-item">
                     复习卡片：{{ pageData.oldNum }}
-                </div>
-                <el-divider>
+                </div> -->
+                <el-badge :value="pageData.newNum" :max="1000" :type="pageData.newNumType">
+                    <el-button disabled>新卡片</el-button>
+                </el-badge>
+                <!-- <el-divider direction="vertical" /> -->
+                <el-badge :value="pageData.oldNum" :max="1000" :type="pageData.oldNumType">
+                    <el-button disabled>复习卡片</el-button>
+                </el-badge>
+                <!-- <el-divider>
                     <el-icon><star-filled /></el-icon>
-                </el-divider>
+                </el-divider> -->
                 <div class="study-button">
                     <el-button v-show="pageData.newNum+pageData.oldNum>0" type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
                 </div>
             </el-card>
         </el-col>
-        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :sm="4" :md="6" :lg="8" />
     </el-row>
 </template>
 
@@ -460,6 +474,7 @@ const goStudy = () => {
 }
 .el-card {
     text-align: left;
+    // background: #fafafa;
 }
 .study-item {
     margin-top: 15px;
@@ -468,11 +483,18 @@ const goStudy = () => {
 }
 .study-button {
     text-align: center;
+    margin-top: 30px;
 }
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
+}
+.el-badge {
+    margin: 15px 30px;
+}
+.el-button.is-disabled {
+    background-color: #fafafa;
 }
 </style>

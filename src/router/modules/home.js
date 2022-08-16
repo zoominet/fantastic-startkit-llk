@@ -9,7 +9,7 @@ export default {
             path: 'dashboard',
             component: () => import('@/views/home/dashboard.vue'),
             meta: {
-                title: 'Dashboard',
+                title: '学习',
                 requireLogin: true
             }
         },
@@ -17,7 +17,7 @@ export default {
             path: 'mycard',
             component: () => import('@/views/home/mycard.vue'),
             meta: {
-                title: '我的卡片',
+                title: '浏览',
                 requireLogin: true
             }
         },
@@ -25,7 +25,7 @@ export default {
             path: 'newcard',
             component: () => import('@/views/home/newcard.vue'),
             meta: {
-                title: '创建卡片',
+                title: '创建',
                 requireLogin: true
             }
         },
@@ -33,7 +33,7 @@ export default {
             path: 'search-result',
             component: () => import('@/views/home/search.result.vue'),
             meta: {
-                title: '创建卡片',
+                title: '搜索结果',
                 requireLogin: true
             }
         },

@@ -24,7 +24,8 @@ const pageData = reactive({
     studyCompleted: false,
     studyPercentage: 0,
     studyCount: 0,
-    backColor: 'linear-gradient(#B3E5FC, #E8F5E9)'
+    backColor: '#ECEFF1'
+    // backColor: 'linear-gradient(#B3E5FC, #E8F5E9)'
 })
 
 const queueCount = computed(() => queueStore.queueCount)
@@ -46,7 +47,8 @@ const contentHeight = () => {
 const lookQuestionAction = () => {
     pageData.loading = true
     pageData.lookAnswer = false
-    pageData.backColor = 'linear-gradient(#B3E5FC, #E8F5E9)'
+    // pageData.backColor = 'linear-gradient(#B3E5FC, #E8F5E9)'
+    pageData.backColor = '#ECEFF1'
 
     let cardid = queueStore.getCardId()
     // console.log('b', cardid)
@@ -139,7 +141,7 @@ const labelAndNextAction = mLabel => {
                 shouldTime = currentTime + 25 * 60 * 1000 // 30分钟
                 break
             case 2:
-                shouldTime = currentTime + 9.5 * 60 * 60 * 1000 // 10小时
+                shouldTime = currentTime + 7.5 * 60 * 60 * 1000 // 8小时
                 break
             case 3:
                 shouldTime = currentTime + 14 * 60 * 60 * 1000 // 1天
@@ -332,10 +334,10 @@ lookQuestionAction()
             <el-scrollbar :style="{height:contentHeight(),'padding-left':'10px','padding-right':'10px'}">
                 <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
                 <p />
-                {{ pageData.frontContent }}
+                <div v-html="pageData.frontContent" />
             </el-scrollbar>
         </el-col>
-        <el-col :span="11" class="back-card" :style="{'background':pageData.backColor}">
+        <el-col :span="11" class="back-card" :style="{height:contentHeight(),'background':pageData.backColor}">
             <el-scrollbar :style="{height:contentHeight(),'padding-left':'20px','padding-right':'10px'}">
                 <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
                 <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
@@ -344,7 +346,7 @@ lookQuestionAction()
             </el-scrollbar>
         </el-col>
     </el-row>
-    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FAFAFA','margin-right':'-5px','margin-left':'-5px'}">
+    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FFFFFF','margin-right':'-5px','margin-left':'-5px'}">
         <el-col :span="16 " :offset="4" :style="{height:'60px'}">
             <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
 
@@ -425,7 +427,7 @@ lookQuestionAction()
     //     );
     // background-color: #e1f5fe;
     // background: linear-gradient(#e1f5fe, #ffebee);
-    border: 1px solid;
+    border: 1px solid #cfd8dc;
     box-shadow: --el-box-shadow-dark;
     margin-top: 0;
     margin-bottom: 20px;
@@ -434,7 +436,7 @@ lookQuestionAction()
     background-attachment: fixed;
 }
 .front-card {
-    border: 1px solid;
+    border: 1px solid #cfd8dc;
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 30px;

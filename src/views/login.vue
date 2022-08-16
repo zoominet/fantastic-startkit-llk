@@ -78,6 +78,7 @@ const contentHeight = () => {
                         v-model="form.password"
                         type="password"
                         show-password
+                        @keydown.enter="onLogin"
                     />
                 </el-form-item>
                 <el-form-item label="">
