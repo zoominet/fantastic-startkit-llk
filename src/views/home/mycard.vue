@@ -39,45 +39,57 @@ const pageData = reactive({
     defaultSetId: 0,
     cardLoading: false,
     setLoading: false,
-    cardCount: 0
+    cardCount: 0,
+    currentPage: 1
 })
+
+const getPageCards = cpage => {
+    // console.log('cpage', cpage)
+    pageData.currentPage = cpage
+    getCards(pageData.defaultSetId)
+}
 
 const getCards = setId => {
     // console.log('setId:', setId)
-    if (setId != pageData.defaultSetId) {
-        pageData.defaultSetId = setId
-        pageData.cards = []
-        pageData.cardLoading = true
-        let querydata = {
-            '[]': {
-                'Card': {
-                    'set_id': setId,
-                    '@order': 'id'
-                },
-                'count': 100
+    // if (setId != pageData.defaultSetId) {
+    pageData.defaultSetId = setId
+    pageData.cards = []
+    pageData.cardLoading = true
+    let querydata = {
+        '[]': {
+            'Card': {
+                'set_id': setId,
+                '@order': 'id'
             },
-            '@datasource': 'hikari'
-        }
-        api.post('get', querydata).then(res => {
-            if (res.ok === true) {
-                pageData.cards = res['[]']
-                pageData.cardLoading = false
-            } else {
-                ElMessage({
-                    type: 'error',
-                    showClose: true,
-                    message: res.msg
-                })
-            }
-
-        }).catch(error => {
+            'page': pageData.currentPage - 1,
+            'count': 100,
+            'query': 2
+        },
+        'total@': '/[]/total',
+        // 'info@': '/[]/info',
+        '@datasource': 'hikari'
+    }
+    api.post('get', querydata).then(res => {
+        if (res.ok === true) {
+            pageData.cards = res['[]']
+            pageData.cardCount = res['total']
+            pageData.cardLoading = false
+        } else {
             ElMessage({
                 type: 'error',
                 showClose: true,
-                message: error
+                message: res.msg
             })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
         })
-    }
+    })
+    // }
 }
 
 const getSets = () => {
@@ -232,7 +244,16 @@ getSets()
                             </el-space>
                         </el-space>
                     </el-scrollbar>
-                    <el-pagination background layout="prev, pager, next" :total="pageData.cardCount" :page-size="100" />
+                    <el-pagination
+                        background
+                        layout="prev, pager, next"
+                        :total="pageData.cardCount"
+                        :page-size="100"
+                        :hide-on-single-page="true"
+                        @current-change="getPageCards"
+                        @prev-click="getPageCards"
+                        @next-click="getPageCards"
+                    />
                 </el-col>
             </el-row>
         </el-col>

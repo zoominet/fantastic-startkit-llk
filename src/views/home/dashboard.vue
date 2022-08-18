@@ -7,6 +7,7 @@
 </route>
 
 <script setup name="dashboard">
+
 // const { proxy } = getCurrentInstance()
 const router = useRouter()
 import api from '@/api'
@@ -54,6 +55,15 @@ const dayboard = reactive({
     shouldNum: 0,
     studyNum: 0
 })
+const curStartTime = () => {
+    let time = new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+    return time
+}
+// 当天结束时间
+const curEndTime = () => {
+    const time = new Date(new Date().setHours(23, 59, 59, 999)).getTime()
+    return time
+}
 const getShouldCards = () => {
     pageData.loading = true
     pageData.newNum = 0
@@ -64,13 +74,15 @@ const getShouldCards = () => {
     dayboard.shouldNum = 0
     dayboard.cycleday = [0, 0, 0, 0, 0, 0, 0, 0]
     let timestamp = Date.now()
+    // console.log(curStartTime(), curEndTime(), curEndTime() - curStartTime())
     // timestamp += 30 * 60 * 1000 // 查询后续半小时以内需要学习的卡片
     // console.log(timestamp)
     let querydata = {
         '[]': {
             'StudyQueue': {
                 '@role': 'OWNER',
-                // 'should_time{}': '<=' + timestamp,
+                'should_time{}': '<=' + curEndTime(),
+                // 'should_time{}': '>' + curStartTime(),
                 '@order': 'id'
             },
             // 'Card': {
@@ -384,8 +396,8 @@ const goStudy = () => {
 
 <template>
     <el-row>
-        <el-col :sm="2" :md="4" :lg="6" />
-        <el-col :sm="20" :md="16" :lg="12">
+        <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
+        <el-col :xs="24" :sm="20" :md="16" :lg="12">
             <el-button-group>
                 <el-button type="default" :icon="ArrowLeft" @click="handleGetPrevWeek" />
                 <el-button type="default" :style="{'width':'400px','font-size':'18px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
@@ -394,11 +406,11 @@ const goStudy = () => {
                 </el-button>
             </el-button-group>
         </el-col>
-        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
     </el-row>
     <el-row>
-        <el-col :sm="2" :md="4" :lg="6" />
-        <el-col :sm="20" :md="16" :lg="12">
+        <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
+        <el-col :xs="24" :sm="20" :md="16" :lg="12">
             <div class="demo-progress">
                 <el-progress v-for="i in 7" :key="i" type="circle" width="65" :percentage="weekboard.dayPercentage[i-1]" :color="colors">
                     <span class="percentage-label" v-html="weekboard.weekStr[i-1]" />
@@ -423,11 +435,11 @@ const goStudy = () => {
                 </el-progress> -->
             </div>
         </el-col>
-        <el-col :sm="2" :md="4" :lg="6" />
+        <el-col :xs="0" :sm="2" :md="4" :lg="6" />
     </el-row>
     <el-row>
-        <el-col :sm="4" :md="6" :lg="8" />
-        <el-col :sm="16" :md="12" :lg="8">
+        <el-col :xs="0" :sm="4" :md="6" :lg="8" />
+        <el-col :xs="24" :sm="16" :md="12" :lg="8">
             <el-card v-loading="pageData.loading" shadow="always">
                 <template #header>
                     <div class="card-header">
@@ -456,7 +468,7 @@ const goStudy = () => {
                 </div>
             </el-card>
         </el-col>
-        <el-col :sm="4" :md="6" :lg="8" />
+        <el-col :xs="0" :sm="4" :md="6" :lg="8" />
     </el-row>
 </template>
 

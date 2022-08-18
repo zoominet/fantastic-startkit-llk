@@ -67,7 +67,7 @@ const contentHeight = () => {
         <el-col :sm="6" :md="8" :lg="10" />
         <el-col :sm="12" :md="8" :lg="4" :style="{height:contentHeight()}">
             <el-image style="width: 120px; height: 120px;" :src="url" :fit="fit" />
-            <h2 />
+            <h2>零卡</h2>
 
             <el-form :model="form" size="large" label-width="60px">
                 <el-form-item label="手机号">
@@ -121,7 +121,8 @@ body {
     margin-left: 50px;
 }
 h2 {
-    margin-top: 60px;
+    margin-bottom: 60px;
+    margin-top: 0;
 }
 .el-affix {
     text-align: center;

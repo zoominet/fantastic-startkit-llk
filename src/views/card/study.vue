@@ -240,7 +240,7 @@ const labelAndNextAction = mLabel => {
     sessionDuration(true)
 }
 
-document.onkeydown = function() {
+document.onkeyup = function() {
     let key = window.event.keyCode
     if (pageData.studyCompleted == false && pageData.loading == false) {
         if (pageData.lookAnswer == false) {
