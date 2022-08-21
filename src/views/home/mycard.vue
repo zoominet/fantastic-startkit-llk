@@ -132,7 +132,7 @@ getSets()
 
 <template>
     <el-row>
-        <el-col v-loading="pageData.setLoading" :span="6" :style="{height:scrollerHeight(true)}">
+        <el-col v-loading="pageData.setLoading" :span="6" :style="{height:scrollerHeight(true),'border-right':'1px solid #d9dfe8'}">
             <el-scrollbar>
                 <el-row>
                     <el-col>
@@ -177,7 +177,7 @@ getSets()
                                             <el-dropdown-item v-if="set.CardSet.set_status==0&&set.CardSet.card_num>0">开始学习</el-dropdown-item>
                                             <el-dropdown-item v-if="set.CardSet.set_status==1">修改学习计划</el-dropdown-item>
                                             <el-dropdown-item>重命名</el-dropdown-item>
-                                            <el-dropdown-item>分享</el-dropdown-item>
+                                            <!-- <el-dropdown-item>分享</el-dropdown-item> -->
                                             <el-dropdown-item>删除</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
@@ -266,6 +266,7 @@ getSets()
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
+    margin-top: -10px;
 }
 .set-item {
     font-size: 16px;
@@ -280,6 +281,7 @@ getSets()
 .box-card {
     width: 130px;
     height: 160px;
+    overflow: hidden;
 }
 .new-card {
     width: 130px;

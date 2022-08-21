@@ -19,7 +19,7 @@ import { ElMessage } from 'element-plus'
 // const settingsStore = useSettingsStore()
 const userStore = useUserStore()
 
-const banner = new URL('/public/login-banner.png', import.meta.url).href
+const banner = new URL('https://linkard.oss-cn-beijing.aliyuncs.com/login-banner.png', import.meta.url).href
 const title = import.meta.env.VITE_APP_TITLE
 
 // 表单类型，login 登录，reset 重置密码

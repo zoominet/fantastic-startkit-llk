@@ -2,8 +2,13 @@
 // const { proxy } = getCurrentInstance()
 // const router = useRouter()
 // const route = useRoute()
+import api from '@/api'
 
 import { reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import useUserStore from '@/store/modules/token'
+
+const userStore = useUserStore()
 
 const cardForm = reactive({
     setid: '1',
@@ -12,7 +17,7 @@ const cardForm = reactive({
     backContent: ''
 })
 
-import Editor from '@tinymce/tinymce-vue'
+// import Editor from '@tinymce/tinymce-vue'
 
 // export default {
 //     name: 'app',
@@ -28,16 +33,73 @@ import Editor from '@tinymce/tinymce-vue'
 //     TEditor,
 // }
 
-const contentHeight = () => {
-    return (window.innerHeight - 200) + 'px'
+// const contentHeight = () => {
+//     return (window.innerHeight - 200) + 'px'
+// }
+
+const regex = /(<([^>]+)>)/ig
+
+const onSubmit = () => {
+    console.log(cardForm)
+
+    if (cardForm.frontContent.replace(regex, '') == '' || cardForm.backContent.replace(regex, '') == '') {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: '请输入卡片正面和背面内容'
+        })
+        return
+    }
+
+    let carddata = {
+        'Card': {
+            'set_id': cardForm.setid,
+            'front_temp_id': cardForm.tempid,
+            'create_by': userStore.token,
+            'front_content': cardForm.frontContent,
+            'back_content': cardForm.backContent,
+            '@role': 'OWNER'
+        },
+        'tag': 'Card',
+        '@datasource': 'hikari'
+    }
+    api.post('post', carddata).then(res => {
+        if (res.ok === true) {
+
+            ElMessage({
+                type: 'success',
+                showClose: true,
+                message: '创建成功'
+            })
+            resetContent()
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+}
+
+const resetContent = () => {
+    cardForm.frontContent = ''
+    cardForm.backContent = ''
 }
 
 </script>
 
 <template>
     <el-row class="firstline">
-        <el-col :span="18" :style="{'text-align':'left'}">
-            <el-form :inline="true" size="mini" :model="cardForm">
+        <el-col :span="6" :style="{'text-align':'left'}">
+            <!-- <el-form :inline="true" size="mini" :model="cardForm">
                 <el-form-item label="">
                     <el-select v-model="cardForm.setid" placeholder="">
                         <el-option label="默认卡片组" value="1" />
@@ -46,34 +108,45 @@ const contentHeight = () => {
                 </el-form-item>
                 <el-form-item label="">
                     <el-select v-model="cardForm.tempid" placeholder="">
-                        <el-option label="默认模板" value="1" />
+                        <el-option label="默认模板:正反卡片" value="1" />
                     </el-select>
                 </el-form-item>
-            </el-form>
+            </el-form> -->
         </el-col>
-        <el-col :span="6" :style="{'text-align':'right'}">
-            <el-form :inline="true" size="mini">
-                <el-button type="primary" @click="onSubmit">新增</el-button>
-                <el-button type="primary" @click="onSubmit">新增&继续</el-button>
+        <el-col :span="18" :style="{'text-align':'right'}">
+            <el-form :inline="true" size="mini" :model="cardForm">
+                <el-form-item label="卡片组：">
+                    <el-select v-model="cardForm.setid" placeholder="">
+                        <el-option label="默认组" value="7" />
+                        <el-option label="Zone two" value="2" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit">新增</el-button>
+                    <el-button type="info" plain @click="resetContent">重置</el-button>
+                <!-- <el-button type="primary" @click="onSubmit">新增&继续</el-button> -->
+                </el-form-item>
             </el-form>
         </el-col>
     </el-row>
     <!-- <el-divider>
         <el-icon><star-filled /></el-icon>
     </el-divider> -->
-    <el-row>
-        <el-col :span="12" :style="{'padding-top': '10px'}">
-            正面/问题
+    <el-row :style="{'margin-top':'-10px','border':'1px solid var(--el-border-color)','font-size': 'var(--el-font-size-extra-large)'}">
+        <el-col :span="12" :style="{'padding':'10px 0','background':'#fff'}">
+            正面
         </el-col>
-        <el-col :span="12" :style="{'padding-top': '10px'}">
-            背面/答案
+        <el-col :span="12" :style="{'padding':'10px 0','background':'#ECEFF1'}">
+            背面
         </el-col>
     </el-row>
     <el-row :style="{'margin-top':'-10px'}">
-        <el-col :span="12" :style="{'padding': '10px'}">
+        <el-col :span="12">
             <!-- <TEditor ref="editor" v-model="cardForm.frontContent" /> -->
-
-            <editor
+            <Editor
+                v-model="cardForm.frontContent"
+            />
+            <!-- <editor
                 v-model="cardForm.frontContent"
                 api-key="7kdjc9shmflxt8292cfpao9aj9qm7i2vbfbyqc3un3sh1zb3"
                 :init="{
@@ -83,19 +156,11 @@ const contentHeight = () => {
                     plugins: 'lists link image table code help wordcount',
                     images_upload_url: 'postAcceptor.php'
                 }"
-            />
+            /> -->
         </el-col>
-        <el-col :span="12" :style="{'padding': '10px'}">
-            <editor
+        <el-col :span="12" :style="{'background':'#ECEFF1'}">
+            <Editor
                 v-model="cardForm.backContent"
-                api-key="7kdjc9shmflxt8292cfpao9aj9qm7i2vbfbyqc3un3sh1zb3"
-                :init="{
-                    selector: 'textarea',
-                    language: 'zh_CN',
-                    height :contentHeight(),
-                    plugins: 'lists link image table code help wordcount',
-                    images_upload_url: 'postAcceptor.php'
-                }"
             />
         </el-col>
     </el-row>
@@ -110,12 +175,7 @@ const contentHeight = () => {
     border-radius: 1px;
 }
 .firstline {
-    border-bottom: 1px dashed var(--el-border-color);
+    // border-bottom: 1px dashed var(--el-border-color);
 }
-.el-form-item {
-    margin-bottom: 10px;
-}
-.editor {
-    margin: 10px;
-}
+
 </style>
