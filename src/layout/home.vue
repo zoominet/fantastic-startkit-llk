@@ -24,7 +24,7 @@ const searchAction = () => {
     router.push({ path: '/home/search-result' })
 }
 const profileItemMargin = () => {
-    let h = (window.innerHeight - 500)
+    let h = (window.innerHeight - 550)
     if (h < 30)
         return '30px'
     return h + 'px'
@@ -35,11 +35,11 @@ const profileItemMargin = () => {
 <template>
     <el-container>
         <el-aside width="100px" :class="{'left-link':'1'}">
-            <el-row>
-                <el-col :span="24">
-                    <el-image style="width: 60px; height: 60px;" :src="url" :fit="fit" />
-                </el-col>
-            </el-row>
+            <!-- <el-row>
+                <el-col :span="24"> -->
+            <el-image style="width: 70px; height: 70px;margin: 15px;" :src="url" :fit="fit" />
+            <!-- </el-col>
+            </el-row> -->
             <el-row>
                 <el-col :span="24" :style="{height:'50px'}" />
             </el-row>
@@ -97,7 +97,7 @@ const profileItemMargin = () => {
         </el-aside>
         <el-container>
             <el-header height="60px">
-                <el-row :style="{'margin-top':'1px;'}">
+                <el-row>
                     <el-col :span="6" :offset="9">
                         <el-input
                             v-model="homeVar.gSearchValue"
@@ -120,6 +120,7 @@ const profileItemMargin = () => {
 <style lang="scss">
 body {
     background-color: #fff;
+    overflow-x: hidden;
 }
 .el-container {
     min-height: 700px;
@@ -138,25 +139,30 @@ body {
 .el-aside {
     background-color: #fafafa;
     border-right: 1px solid #d9dfe8;
-    margin-top: -8px;
-    margin-left: -8px;
-    margin-bottom: -16px;
+    // margin-top: -8px;
+    // margin-left: -8px;
+    // margin-bottom: -16px;
+    overflow: hidden;
 }
 .el-header {
     border-bottom: 1px solid #d9dfe8;
-    margin-top: -8px;
-    margin-right: -8px;
+    // margin-top: -8px;
+    // margin-right: -8px;
+    overflow: hidden;
 }
 .el-main {
-    margin-bottom: -16px;
-    margin-right: -8px;
-    overflow: hidden;
+    // margin-bottom: -16px;
+    // margin-right: -8px;
+    // overflow: hidden;
 
     --el-main-padding: 0;
 }
 .el-menu {
     --el-menu-bg-color: #fafafa;
     --el-menu-hover-bg-color: var(--el-color-primary-light-9);
+
+    border-right: 0;
+    // overflow: hidden;
 }
 .el-menu-item {
     // width: 200px;

@@ -9,8 +9,15 @@ export default [
         component: () => import('@/views/index.vue')
     },
     {
-        path: '/login',
+        path: '/login-bak',
         component: () => import('@/views/login.vue'),
+        meta: {
+            title: '登录'
+        }
+    },
+    {
+        path: '/login',
+        component: () => import('@/views/signinup.vue'),
         meta: {
             title: '登录'
         }

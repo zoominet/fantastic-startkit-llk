@@ -27,7 +27,7 @@ const scrollerHeight = left => {
     if (left)
         return (window.innerHeight - 80) + 'px'
     else
-        return (window.innerHeight - 175) + 'px'
+        return (window.innerHeight - 207) + 'px'
 }
 const goNewCard = () => {
     router.push({ path: '/home/newcard' })
@@ -305,6 +305,8 @@ getSets()
     text-align: left;
 }
 .el-pagination {
-    padding: 5px 10px;
+    // padding: 5px 10px;
+    padding-top: 20px;
+    padding-left: 15px;
 }
 </style>

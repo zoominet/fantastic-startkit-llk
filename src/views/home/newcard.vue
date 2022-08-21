@@ -29,7 +29,7 @@ import Editor from '@tinymce/tinymce-vue'
 // }
 
 const contentHeight = () => {
-    return (window.innerHeight - 180) + 'px'
+    return (window.innerHeight - 200) + 'px'
 }
 
 </script>

@@ -41,7 +41,8 @@ const timeCounter = reactive({
 })
 
 const contentHeight = () => {
-    return (window.innerHeight - 215) + 'px'
+    // console.log('window.innerHeight - 195', window.innerHeight - 195)
+    return (window.innerHeight - 175) + 'px'
 }
 
 const lookQuestionAction = () => {
@@ -346,7 +347,7 @@ lookQuestionAction()
             </el-scrollbar>
         </el-col>
     </el-row>
-    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FFFFFF','margin-right':'-5px','margin-left':'-5px'}">
+    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FFFFFF','margin':'0px'}">
         <el-col :span="16 " :offset="4" :style="{height:'60px'}">
             <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
 
@@ -370,16 +371,19 @@ lookQuestionAction()
 
 <style lang="scss" scoped>
 // scss
-.el-row {
-    margin: 10px;
-    text-align: center;
-    // font-size: 30px;
+.el-page-header {
+    // margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 0;
+    padding-top: 10px;
 }
 .el-col {
     border-radius: 4px;
     margin-top: 20px;
 }
 .study-progress .el-progress--line {
+    margin-top: -10px;
     margin-bottom: 15px;
     width: 100%;
 }
@@ -430,16 +434,18 @@ lookQuestionAction()
     border: 1px solid #cfd8dc;
     box-shadow: --el-box-shadow-dark;
     margin-top: 0;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     font-size: 20px;
     background-size: cover;
     background-attachment: fixed;
+    min-height: 300px;
 }
 .front-card {
     border: 1px solid #cfd8dc;
     margin-top: 0;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     font-size: 30px;
+    min-height: 300px;
 }
 div p {
     text-align: center;

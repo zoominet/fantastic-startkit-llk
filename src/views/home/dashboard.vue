@@ -134,7 +134,6 @@ const getShouldCards = () => {
                     // 计算今天的应该学习总量
                     dayboard.shouldNum = dayboard.cycleday[0] * 4 + dayboard.cycleday[1] * 3 + dayboard.cycleday[2] * 2 + dayboard.cycleday[3] + dayboard.cycleday[4] + dayboard.cycleday[5] + dayboard.cycleday[6] + dayboard.cycleday[7] + dayboard.cycleElse
                 }
-                initWeekData()
 
                 // pageData.queueCards = res['[]']
                 // console.log(pageData.queueCards)
@@ -147,10 +146,13 @@ const getShouldCards = () => {
                 }
 
             }
+
             if (pageData.newNum > 0)
                 pageData.newNumType = ''
             if (pageData.oldNum > 0)
                 pageData.oldNumType = ''
+
+            initWeekData()
             pageData.loading = false
         } else {
             ElMessage({

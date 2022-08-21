@@ -31,16 +31,16 @@ const tabPosition = ref('left')
 
 const pageData = reactive({
     lu: {},
-    uname: ''
+    uname: 'WIP'
 })
 
 const initProfile = () => {
 
-    pageData.lu = tokenStore.getLoginUser()
-    console.log(pageData.lu)
-    if (pageData.lu) {
-        pageData.uname = pageData.lu.name
-    }
+    // pageData.lu = tokenStore.getLoginUser()
+    // console.log(pageData.lu)
+    // if (pageData.lu) {
+    //     pageData.uname = pageData.lu.name
+    // }
 }
 initProfile()
 </script>

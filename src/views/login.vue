@@ -50,6 +50,12 @@ const onLogin = () => {
         //         router.go(-1)
         //     }
         // }
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
     })
 
 }
@@ -121,8 +127,6 @@ body {
     margin-left: 50px;
 }
 h2 {
-    margin-bottom: 60px;
-    margin-top: 0;
 }
 .el-affix {
     text-align: center;

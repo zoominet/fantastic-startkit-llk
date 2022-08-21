@@ -16,6 +16,29 @@ watch(() => settingsStore.title, () => {
 }, {
     immediate: true
 })
+
+watch(() => settingsStore.mode, () => {
+    // if (settingsStore.mode === 'pc') {
+    //     settingsStore.$patch(state => {
+    //         state.menu.subMenuCollapse = settingsStore.subMenuCollapseLastStatus
+    //     })
+    // } else if (settingsStore.mode === 'mobile') {
+    //     settingsStore.$patch(state => {
+    //         state.menu.subMenuCollapse = true
+    //     })
+    // }
+    document.body.setAttribute('data-mode', settingsStore.mode)
+}, {
+    immediate: true
+})
+
+onMounted(() => {
+    window.onresize = () => {
+        settingsStore.setMode(document.documentElement.clientWidth)
+    }
+    window.onresize()
+})
+
 </script>
 
 <template>

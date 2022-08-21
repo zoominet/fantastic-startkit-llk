@@ -6,9 +6,9 @@ const useTokenStore = defineStore(
     'token',
     {
         state: () => ({
-            token: localStorage.token,
-            failuretime: localStorage.failuretime,
-            loginUser: {}
+            account: localStorage.account || '',
+            token: localStorage.token || '',
+            failuretime: localStorage.failuretime
         }),
         getters: {
             isLogin: state => {
@@ -46,15 +46,15 @@ const useTokenStore = defineStore(
                             localStorage.setItem('token', res.user.id)
                             localStorage.setItem('failuretime', Date.parse(new Date()) / 1000 + 24 * 60 * 60)
                             this.token = res.user.id
-                            this.loginUser = res.user
                             this.failuretime = Date.parse(new Date()) / 1000 + 24 * 60 * 60
                             resolve(res)
                         } else {
-                            ElMessage({
-                                type: 'error',
-                                showClose: true,
-                                message: res.msg
-                            })
+                            // ElMessage({
+                            //     type: 'error',
+                            //     showClose: true,
+                            //     message: res.msg
+                            // })
+                            reject(res.msg)
                         }
 
                     }).catch(error => {
@@ -63,7 +63,7 @@ const useTokenStore = defineStore(
                 })
             },
             logout() {
-                return new Promise(resolve => {
+                return new Promise((resolve, reject) => {
                     api.post('logout').then(res => {
                         console.log(res)
                         if (res.ok === true) {
@@ -71,7 +71,6 @@ const useTokenStore = defineStore(
                             localStorage.removeItem('token')
                             localStorage.removeItem('failuretime')
                             this.token = null
-                            this.loginUser = {}
                             this.failuretime = null
                             // resolve()
                         }
@@ -84,14 +83,12 @@ const useTokenStore = defineStore(
                         // }
 
                     }).catch(error => {
-                        // reject(error)
+                        reject(error)
                     })
                     resolve()
                 })
-            },
-            getLoginUser() {
-                return this.loginUser
             }
+
         }
     }
 )
