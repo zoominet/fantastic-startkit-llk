@@ -25,9 +25,9 @@ const showNewSetForm = () => {
 
 const scrollerHeight = left => {
     if (left)
-        return (window.innerHeight - 80) + 'px'
+        return (window.innerHeight - 20) + 'px'
     else
-        return (window.innerHeight - 207) + 'px'
+        return (window.innerHeight - 136) + 'px'
 }
 const goNewCard = () => {
     router.push({ path: '/home/newcard' })
@@ -213,7 +213,7 @@ getSets()
             </el-row>
             <el-row v-loading="pageData.cardLoading" :style="{'margin-top':'18px'}">
                 <el-col>
-                    <el-scrollbar :style="{height:scrollerHeight(false)}">
+                    <el-scrollbar :style="{height:scrollerHeight(false),'background':'var(--el-color-info-light-9)','padding':'10px'}">
                         <el-space direction="horizontal" alignment="start">
                             <el-space wrap>
                                 <el-card class="new-card" @click="goNewCard">
@@ -244,6 +244,10 @@ getSets()
                             </el-space>
                         </el-space>
                     </el-scrollbar>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col>
                     <el-pagination
                         background
                         layout="prev, pager, next"
@@ -277,6 +281,7 @@ getSets()
     font-size: 14px;
     // margin-top: 10px;
     text-align: center;
+    margin: -10px;
 }
 .box-card {
     width: 130px;
@@ -286,9 +291,9 @@ getSets()
 .new-card {
     width: 130px;
     height: 160px;
-    background-color: #fafafa;
+    // background-color: #fafafa;
     box-shadow: var(--el-box-shadow-light);
-    border: 2px dashed #e0e0e0;
+    border: 1px dashed #e0e0e0;
 }
 .setname {
     width: 150px;
@@ -307,8 +312,6 @@ getSets()
     text-align: left;
 }
 .el-pagination {
-    // padding: 5px 10px;
-    padding-top: 20px;
-    padding-left: 15px;
+    justify-content: center;
 }
 </style>

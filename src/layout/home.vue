@@ -5,7 +5,7 @@ const url =
 import {
     Flag,
     CirclePlusFilled,
-    Tools,
+    UserFilled,
     Search, Menu
 } from '@element-plus/icons-vue'
 
@@ -13,7 +13,7 @@ const router = useRouter()
 // const route = useRoute()
 
 const mainHeight = () => {
-    return (window.innerHeight - 60) + 'px'
+    return (window.innerHeight) + 'px'
 }
 
 const homeVar = reactive({
@@ -24,7 +24,7 @@ const searchAction = () => {
     router.push({ path: '/home/search-result' })
 }
 const profileItemMargin = () => {
-    let h = (window.innerHeight - 550)
+    let h = (window.innerHeight - 530)
     if (h < 30)
         return '30px'
     return h + 'px'
@@ -63,8 +63,8 @@ const profileItemMargin = () => {
                     <template #title>浏览</template>
                 </el-menu-item>
                 <el-menu-item index="4" route="/home/profile" :style="{'margin-top':profileItemMargin()}">
-                    <el-icon><Tools /></el-icon>
-                    <template #title>设置</template>
+                    <el-icon><UserFilled /></el-icon>
+                    <template #title>我</template>
                 </el-menu-item>
             </el-menu>
 
@@ -95,7 +95,8 @@ const profileItemMargin = () => {
                 </el-col>
             </el-row> -->
         </el-aside>
-        <el-container>
+        <el-main :style="{height: mainHeight()}"><RouterView /></el-main>
+        <!-- <el-container>
             <el-header height="60px">
                 <el-row>
                     <el-col :span="6" :offset="9">
@@ -113,7 +114,7 @@ const profileItemMargin = () => {
                 </el-row>
             </el-header>
             <el-main :style="{height: mainHeight()}"><RouterView /></el-main>
-        </el-container>
+        </el-container> -->
     </el-container>
 </template>
 

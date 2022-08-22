@@ -42,7 +42,7 @@ const timeCounter = reactive({
 
 const contentHeight = () => {
     // console.log('window.innerHeight - 195', window.innerHeight - 195)
-    return (window.innerHeight - 175) + 'px'
+    return (window.innerHeight - 145) + 'px'
 }
 
 const lookQuestionAction = () => {
@@ -315,58 +315,63 @@ lookQuestionAction()
 </script>
 
 <template>
-    <el-page-header :icon="ArrowLeft" title="" content=" " @back="goBack" />
-    <el-row>
-        <el-col :span="24">
-            <div class="study-progress">
-                <el-progress
-                    :text-inside="true"
-                    :stroke-width="5"
-                    :percentage="pageData.studyPercentage"
-                    status="info"
-                >
-                    <span />
-                </el-progress>
-            </div>
-        </el-col>
-    </el-row>
-    <el-row v-loading="pageData.loading">
-        <el-col :span="11" :offset="1" :style="{height:contentHeight()}" class="front-card">
-            <el-scrollbar :style="{height:contentHeight(),'padding-left':'10px','padding-right':'10px'}">
-                <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
-                <p />
-                <div v-html="pageData.frontContent" />
-            </el-scrollbar>
-        </el-col>
-        <el-col :span="11" class="back-card" :style="{height:contentHeight(),'background':pageData.backColor}">
-            <el-scrollbar :style="{height:contentHeight(),'padding-left':'20px','padding-right':'10px'}">
-                <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
-                <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
-                    <div v-html="pageData.backContent" />
+    <el-main>
+        <!-- <el-page-header :icon="ArrowLeft" title="" content=" " @back="goBack" /> -->
+        <el-row>
+            <el-col :span="24">
+                <div class="study-progress">
+                    <el-progress
+                        :text-inside="true"
+                        :stroke-width="5"
+                        :percentage="pageData.studyPercentage"
+                        status="info"
+                    >
+                        <span />
+                    </el-progress>
                 </div>
-            </el-scrollbar>
-        </el-col>
-    </el-row>
-    <el-row v-show="!pageData.studyCompleted" :style="{'background-color':'#FFFFFF','margin':'0px'}">
-        <el-col :span="16 " :offset="4" :style="{height:'60px'}">
-            <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
+            </el-col>
+        </el-row>
+        <el-row v-loading="pageData.loading">
+            <el-col :span="11" :offset="1" :style="{height:contentHeight()}" class="front-card">
+                <el-scrollbar :style="{height:contentHeight(),'padding-left':'10px','padding-right':'10px'}">
+                    <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
+                    <p />
+                    <div v-html="pageData.frontContent" />
+                </el-scrollbar>
+            </el-col>
+            <el-col :span="11" class="back-card" :style="{height:contentHeight(),'background':pageData.backColor}">
+                <el-scrollbar :style="{height:contentHeight(),'padding-left':'20px','padding-right':'10px'}">
+                    <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
+                    <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
+                        <div v-html="pageData.backContent" />
+                    </div>
+                </el-scrollbar>
+            </el-col>
+        </el-row>
+        <el-row :style="{'background-color':'#ffffff'}">
+            <el-col :span="2">
+                <el-button size="default" class="buttonArea" round @click="goBack"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+            </el-col>
+            <el-col v-show="!pageData.studyCompleted" :span="20">
+                <el-button v-show="!pageData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
 
-            <div v-show="pageData.lookAnswer">
-                <el-button type="danger" round @click="labelAndNextAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
-                <el-button type="warning" round @click="labelAndNextAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
-                <el-button type="success" round @click="labelAndNextAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
-            </div>
+                <div v-show="pageData.lookAnswer">
+                    <el-button type="danger" round @click="labelAndNextAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
+                    <el-button type="warning" round @click="labelAndNextAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
+                    <el-button type="success" round @click="labelAndNextAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
+                </div>
             <!-- <div
             ><kbd class="DocSearch-Button-Key">1</kbd></div> -->
             <!-- <kbd class="DocSearch-Button-Key">⌘</kbd>
             <kbd class="DocSearch-Button-Key">1</kbd>
             <kbd class="DocSearch-Button-Key">2</kbd>
             <kbd class="DocSearch-Button-Key">3</kbd> or <kbd class="DocSearch-Button-Key">Ctrl</kbd> -->
-        </el-col>
-        <el-col :span="2">
-            {{ timeCounter.strTime }}
-        </el-col>
-    </el-row>
+            </el-col>
+            <el-col :span="2">
+                {{ timeCounter.strTime }}
+            </el-col>
+        </el-row>
+    </el-main>
 </template>
 
 <style lang="scss" scoped>
@@ -380,11 +385,11 @@ lookQuestionAction()
 }
 .el-col {
     border-radius: 4px;
-    margin-top: 20px;
+    // margin-top: 20px;
+    align-self: center;
 }
 .study-progress .el-progress--line {
-    margin-top: -10px;
-    margin-bottom: 15px;
+    margin: 10px 0;
     width: 100%;
 }
 .Num-Button-Key {
@@ -449,5 +454,8 @@ lookQuestionAction()
 }
 div p {
     text-align: center;
+}
+.buttonArea {
+    margin: 24px 0;
 }
 </style>
