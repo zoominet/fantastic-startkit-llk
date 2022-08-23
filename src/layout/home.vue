@@ -62,7 +62,8 @@ const profileItemMargin = () => {
                     <el-icon><Menu /></el-icon>
                     <template #title>浏览</template>
                 </el-menu-item>
-                <el-menu-item index="4" route="/home/profile" :style="{'margin-top':profileItemMargin()}">
+                <!-- <el-menu-item index="4" route="/home/profile" :style="{'margin-top':profileItemMargin()}"> -->
+                <el-menu-item index="4" route="/home/profile">
                     <el-icon><UserFilled /></el-icon>
                     <template #title>我</template>
                 </el-menu-item>

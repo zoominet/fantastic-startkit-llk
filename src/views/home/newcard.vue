@@ -11,7 +11,8 @@ import useUserStore from '@/store/modules/token'
 const userStore = useUserStore()
 
 const cardForm = reactive({
-    setid: '1',
+    sets: [],
+    setid: '',
     tempid: '1',
     frontContent: '',
     backContent: ''
@@ -65,13 +66,52 @@ const onSubmit = () => {
     }
     api.post('post', carddata).then(res => {
         if (res.ok === true) {
+            let setCardsNum = 0
+            for (var i = 0; i < cardForm.sets.length; i++) {
+                if (cardForm.sets[i].CardSet.id == cardForm.setid) {
+                    setCardsNum = cardForm.sets[i].CardSet.card_num
+                }
+            }
+            let cardset = {
+                'CardSet': {
+                    'id': cardForm.setid,
+                    'card_num': setCardsNum + 1,
+                    'update_by': userStore.token,
+                    'update_time': getCurrentDatetime()
+                },
+                'tag': 'CardSet',
+                '@datasource': 'hikari'
+            }
+            api.post('put', cardset).then(res => {
+                if (res.ok === true) {
 
-            ElMessage({
-                type: 'success',
-                showClose: true,
-                message: '创建成功'
+                    ElMessage({
+                        type: 'success',
+                        showClose: true,
+                        message: '创建成功'
+                    })
+                    resetContent()
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        showClose: true,
+                        message: res.msg
+                    })
+                }
+
+            }).catch(error => {
+                ElMessage({
+                    type: 'error',
+                    showClose: true,
+                    message: error
+                })
             })
-            resetContent()
+            // ElMessage({
+            //     type: 'success',
+            //     showClose: true,
+            //     message: '创建成功'
+            // })
+            // resetContent()
         } else {
             ElMessage({
                 type: 'error',
@@ -94,6 +134,45 @@ const resetContent = () => {
     cardForm.backContent = ''
 }
 
+const getCurrentDatetime = () => {
+    const date = new Date(+new Date() + 8 * 3600 * 1000)
+    const str = date.toISOString().slice(0, 19).replace('T', ' ')
+    // console.log('ctime', str)
+    return str
+}
+
+const getCartSets = () => {
+
+    let querydata = {
+        '[]': {
+            'CardSet': {
+                '@role': 'OWNER'
+            },
+            'query': 0
+        },
+        '@datasource': 'hikari'
+    }
+    api.post('get', querydata).then(res => {
+        if (res.ok === true) {
+            cardForm.sets = res['[]']
+            cardForm.setid = cardForm.sets[0].CardSet.id
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+}
+getCartSets()
 </script>
 
 <template>
@@ -115,10 +194,14 @@ const resetContent = () => {
         </el-col>
         <el-col :span="18" :style="{'text-align':'right'}">
             <el-form :inline="true" size="mini" :model="cardForm">
-                <el-form-item label="卡片组：">
+                <el-form-item label="所属卡集：">
                     <el-select v-model="cardForm.setid" placeholder="">
-                        <el-option label="默认组" value="7" />
-                        <el-option label="Zone two" value="2" />
+                        <el-option
+                            v-for="item in cardForm.sets"
+                            :key="item.CardSet.id"
+                            :label="item.CardSet.set_name"
+                            :value="item.CardSet.id"
+                        />
                     </el-select>
                 </el-form-item>
                 <el-form-item>

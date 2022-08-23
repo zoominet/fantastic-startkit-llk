@@ -136,14 +136,14 @@ getSets()
             <el-scrollbar>
                 <el-row>
                     <el-col>
-                        <el-button type="primary" size="large" :icon="Plus" round @click="showNewSetForm">新卡片组</el-button>
+                        <el-button type="primary" size="large" :icon="Plus" round @click="showNewSetForm">新卡集</el-button>
                     </el-col>
                 </el-row>
                 <el-row v-show="newSetForm.isDisplay">
                     <el-col>
                         <el-form :inline="true" size="mini" :model="newSetForm">
                             <el-form-item label="">
-                                <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入卡片组名称" />
+                                <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入卡集名称" />
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onSubmit">新增</el-button>
