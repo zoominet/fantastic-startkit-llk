@@ -46,7 +46,10 @@ const pageData = reactive({
     newNum: 0,
     newNumType: 'success',
     oldNum: 0,
-    oldNumType: 'success'
+    oldNumType: 'success',
+    todayTotal: 0,
+    nextStudyTime: '',
+    cardSummary: '你当前拥有 1234 张卡片，已经学了 123 张卡片'
 })
 
 const dayboard = reactive({
@@ -55,14 +58,23 @@ const dayboard = reactive({
     shouldNum: 0,
     studyNum: 0
 })
-const curStartTime = () => {
+const todayStartTime = () => {
     let time = new Date(new Date().setHours(0, 0, 0, 0)).getTime()
     return time
 }
 // 当天结束时间
-const curEndTime = () => {
+const todayEndTime = () => {
     const time = new Date(new Date().setHours(23, 59, 59, 999)).getTime()
     return time
+}
+const getTimeStr = timestamp => {
+    const date = new Date(timestamp)
+    const ndate = new Date(+date + 8 * 3600 * 1000)
+    // console.log('date', date)
+    // console.log('ndate', ndate)
+    const str = ndate.toISOString().slice(0, 19).split('T')[1]
+    // console.log('ctime', str)
+    return str
 }
 const getShouldCards = () => {
     pageData.loading = true
@@ -74,30 +86,34 @@ const getShouldCards = () => {
     dayboard.shouldNum = 0
     dayboard.cycleday = [0, 0, 0, 0, 0, 0, 0, 0]
     let timestamp = Date.now()
-    // console.log(curStartTime(), curEndTime(), curEndTime() - curStartTime())
+    // console.log(curStartTime(), todayEndTime(), todayEndTime() - curStartTime())
     // timestamp += 30 * 60 * 1000 // 查询后续半小时以内需要学习的卡片
     // console.log(timestamp)
     let querydata = {
         '[]': {
             'StudyQueue': {
                 '@role': 'OWNER',
-                'should_time{}': '<=' + curEndTime(),
+                'should_time{}': '<=' + todayEndTime(),
                 // 'should_time{}': '>' + curStartTime(),
-                '@order': 'id'
+                '@order': 'should_time'
             },
             // 'Card': {
             //     'id@': '/StudyQueue/card_id'
             // },
-            'count': 0
+            'count': 0,
+            'query': 2
         },
+        'total@': '/[]/total',
         '@datasource': 'hikari'
     }
     api.post('get', querydata).then(res => {
 
         // console.log(res)
         if (res.ok === true) {
+            pageData.todayTotal = res.total
             if (res['[]']) {
                 let allQueueCards = res['[]']
+                pageData.nextStudyTime = getTimeStr(allQueueCards[0].StudyQueue.should_time)
                 for (var i = 0; i < allQueueCards.length; i++) {
                     if (allQueueCards[i].StudyQueue.should_time <= timestamp) {
                         pageData.queueCards[pageData.queueCards.length] = allQueueCards[i]
@@ -390,25 +406,27 @@ const initWeekData = () => {
 getShouldCards()
 
 const goStudy = () => {
-
     router.push({ path: '/study' })
 }
-
+const goNewCard = () => {
+    router.push({ path: '/home/newcard' })
+}
 </script>
 
 <template>
+    <!-- <el-page-header icon="CirclePlusFilled" title="新卡片" :content="pageData.cardSummary" @back="goNewCard" /> -->
     <el-row>
-        <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
-        <el-col :xs="24" :sm="20" :md="16" :lg="12">
+        <el-col :xs="0" :sm="4" :md="6" :lg="8" hidden-sm-only />
+        <el-col :xs="24" :sm="16" :md="12" :lg="8">
             <el-button-group>
                 <el-button type="default" :icon="ArrowLeft" @click="handleGetPrevWeek" />
-                <el-button type="default" :style="{'width':'400px','font-size':'18px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
+                <el-button type="default" :style="{'font-size':'16px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
                 <el-button type="default" @click="handleGetNextvWeek">
                     <el-icon class="el-icon--right"><ArrowRight /></el-icon>
                 </el-button>
             </el-button-group>
         </el-col>
-        <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
+        <el-col :xs="0" :sm="4" :md="6" :lg="8" hidden-sm-only />
     </el-row>
     <el-row>
         <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
@@ -442,10 +460,10 @@ const goStudy = () => {
     <el-row>
         <el-col :xs="0" :sm="4" :md="6" :lg="8" />
         <el-col :xs="24" :sm="16" :md="12" :lg="8">
-            <el-card v-loading="pageData.loading" shadow="always">
+            <el-card v-loading="pageData.loading" shadow="always" class="study-card">
                 <template #header>
                     <div class="card-header">
-                        <span>本次学习任务</span>
+                        <span>今日任务卡</span><el-tag size="small">剩余 {{ pageData.todayTotal }} 张</el-tag>
                         <el-button size="mini" :icon="Refresh" circle @click="getShouldCards" />
                     </div>
                 </template>
@@ -455,18 +473,22 @@ const goStudy = () => {
                 <div class="study-item">
                     复习卡片：{{ pageData.oldNum }}
                 </div> -->
-                <el-badge :value="pageData.newNum" :max="1000" :type="pageData.newNumType">
-                    <el-button disabled>新卡片</el-button>
-                </el-badge>
-                <!-- <el-divider direction="vertical" /> -->
-                <el-badge :value="pageData.oldNum" :max="1000" :type="pageData.oldNumType">
-                    <el-button disabled>复习卡片</el-button>
-                </el-badge>
-                <!-- <el-divider>
-                    <el-icon><star-filled /></el-icon>
-                </el-divider> -->
-                <div class="study-button">
-                    <el-button v-show="pageData.newNum+pageData.oldNum>0" type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
+                <div class="card-body">
+                    <el-badge :value="pageData.newNum" :max="1000" :type="pageData.newNumType">
+                        <el-button :style="{'width':'100px'}" disabled>新卡片</el-button>
+                    </el-badge>
+                    <!-- <el-divider direction="vertical" /> -->
+                    <el-badge :value="pageData.oldNum" :max="1000" :type="pageData.oldNumType">
+                        <el-button :style="{'width':'100px'}" disabled>复习卡片</el-button>
+                    </el-badge>
+
+                    <el-divider>
+                        <el-icon><Check /></el-icon>
+                    </el-divider>
+                    <div class="study-button">
+                        <el-button v-show="pageData.newNum+pageData.oldNum>0" type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
+                        <el-tag v-show="pageData.newNum+pageData.oldNum==0" effect="dark" size="large">下次学习时间：{{ pageData.nextStudyTime }}</el-tag>
+                    </div>
                 </div>
             </el-card>
         </el-col>
@@ -497,7 +519,7 @@ const goStudy = () => {
 }
 .study-button {
     text-align: center;
-    margin-top: 30px;
+    // margin-top: 30px;
 }
 .card-header {
     display: flex;
@@ -505,10 +527,24 @@ const goStudy = () => {
     align-items: center;
     font-size: 18px;
 }
+.study-card {
+    // width: 400px;
+}
+.card-body {
+    text-align: center;
+}
 .el-badge {
     margin: 15px 30px;
 }
 .el-button.is-disabled {
     background-color: #fafafa;
+}
+.el-divider {
+    margin: 20px 0;
+}
+.el-page-header {
+    line-height: 60px;
+    margin-left: 30px;
+    color: var(--el-color-primary);
 }
 </style>

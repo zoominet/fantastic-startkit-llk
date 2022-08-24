@@ -10,9 +10,10 @@ import { ElMessage } from 'element-plus'
 
 import { reactive } from 'vue'
 
-const formInline = reactive({
-    user: '',
-    region: ''
+const formSearch = reactive({
+    keyword: '',
+    keyscore: '',
+    keyflag: ''
 })
 const newSetForm = reactive({
     setname: '',
@@ -107,7 +108,7 @@ const getSets = () => {
         if (res.ok === true) {
             pageData.sets = res['[]']
             pageData.defaultSetId = pageData.sets[0].CardSet.id
-            getCards(pageData.defaultSetId)
+            // getCards(pageData.defaultSetId)
             pageData.setLoading = false
             // console.log(pageData.sets)
         } else {
@@ -136,28 +137,38 @@ getSets()
             <el-scrollbar>
                 <el-row>
                     <el-col>
-                        <el-button type="primary" size="large" :icon="Plus" round @click="showNewSetForm">新卡集</el-button>
+                        <el-button size="large" :icon="Plus" round @click="showNewSetForm">新卡集</el-button>
                     </el-col>
                 </el-row>
                 <el-row v-show="newSetForm.isDisplay">
                     <el-col>
                         <el-form :inline="true" size="mini" :model="newSetForm">
                             <el-form-item label="">
-                                <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入卡集名称" />
+                                <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入新卡集名称" />
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onSubmit">新增</el-button>
+                                <el-button @click="onSubmit">新增</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>
                 </el-row>
 
-                <!-- <el-row>
+                <!-- <el-row v-for="i in 20" :key="set">
                     <el-col>
                         <el-card>
                             <div class="card-header">
                                 <span>默认组</span>
-                                <el-button class="button" text><el-icon><MoreFilled /></el-icon></el-button>
+                                <el-dropdown size="small">
+                                    <el-icon color="var(--el-color-primary)"><MoreFilled /></el-icon>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <el-dropdown-item>开始学习</el-dropdown-item>
+                                            <el-dropdown-item>修改学习计划</el-dropdown-item>
+                                            <el-dropdown-item>重命名</el-dropdown-item>
+                                            <el-dropdown-item>删除</el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
                             </div>
                             <div :inline="true" class="set-item"><el-icon><CopyDocument /></el-icon> 13 张</div>
                         </el-card>
@@ -166,7 +177,7 @@ getSets()
 
                 <el-row v-for="set in pageData.sets" :key="set">
                     <el-col>
-                        <el-card :style="{'border': '1px solid var(--el-color-primary)'}" @click="getCards(set.CardSet.id)">
+                        <el-card :style="{'border': '1px solid var(--el-color-primary)'}" shadow="hover" @click="getCards(set.CardSet.id)">
                             <div class="card-header">
                                 <span>{{ set.CardSet.set_name }}</span>
                                 <!-- <el-button class="button" size="mini" text><el-icon><MoreFilled /></el-icon></el-button> -->
@@ -194,36 +205,57 @@ getSets()
         </el-col>
         <el-col :span="18">
             <el-row>
-                <el-col>
-                    <el-form :inline="true" size="mini" :model="formInline">
-                        <el-form-item label="关键字">
-                            <el-input v-model="formInline.user" placeholder="" />
+                <el-col :span="4">
+                    <el-button type="primary" size="large" :icon="Plus" round @click="goNewCard">新卡片</el-button>
+                </el-col>
+                <el-col :span="20" :style="{'text-align':'right'}">
+                    <el-form :inline="true" size="mini" :model="formSearch">
+                        <el-form-item label="">
+                            <el-input v-model="formSearch.keyword" placeholder="关键字" />
                         </el-form-item>
-                        <el-form-item label="掌握程度">
-                            <el-select v-model="formInline.region" placeholder="全部">
-                                <el-option label="Zone one" value="shanghai" />
-                                <el-option label="Zone two" value="beijing" />
+                        <el-form-item label="">
+                            <el-select v-model="formSearch.keyscore" :style="{'width':'100px'}" placeholder="掌握程度">
+                                <el-option label="困难" value="1" />
+                                <el-option label="良好" value="2" />
+                                <el-option label="简单" value="3" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="">
+                            <el-select v-model="formSearch.keyflag" :style="{'width':'100px'}" placeholder="旗标">
+                                <el-option label="1" value="1">
+                                    <el-icon><Flag /></el-icon>
+                                </el-option>
+                                <el-option label="2" value="2">
+                                    <el-icon><Flag /></el-icon>
+                                </el-option>
+                                <el-option label="3" value="3">
+                                    <el-icon><Flag /></el-icon>
+                                </el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button @click="onSubmit">筛选</el-button>
+                            <el-button @click="formSearchSubmit">搜索</el-button>
+                        </el-form-item>
+                        <el-form-item :style="{'margin-right':'0'}">
+                            <el-button link size="small" @click="formSearchReset">重置</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
             </el-row>
-            <el-row v-loading="pageData.cardLoading" :style="{'margin-top':'18px'}">
+            <el-row v-loading="pageData.cardLoading" :style="{'margin-top':'10px'}">
                 <el-col>
                     <el-scrollbar :style="{height:scrollerHeight(false),'background':'var(--el-color-info-light-9)','padding':'10px'}">
                         <el-space direction="horizontal" alignment="start">
                             <el-space wrap>
-                                <el-card class="new-card" @click="goNewCard">
+                                <!-- <el-card class="new-card" @click="goNewCard">
                                     <div class="new-item">
                                         <p />
                                         <el-icon class="new-button"><Plus /></el-icon>
                                         <p>新卡片</p>
                                     </div>
-                                </el-card>
-                                <el-card v-for="card in pageData.cards" :key="card" class="box-card">
+                                </el-card> -->
+
+                                <el-card v-for="card in pageData.cards" :key="card" class="box-card" shadow="hover">
                                     <div class="card-header">
                                         <span />
                                         <el-dropdown size="small">
@@ -253,7 +285,6 @@ getSets()
                         layout="prev, pager, next"
                         :total="pageData.cardCount"
                         :page-size="100"
-                        :hide-on-single-page="true"
                         @current-change="getPageCards"
                         @prev-click="getPageCards"
                         @next-click="getPageCards"
@@ -299,7 +330,7 @@ getSets()
     width: 150px;
 }
 .el-form--inline .el-form-item {
-    margin-right: 15px;
+    margin-right: 10px;
     margin-bottom: 0;
 }
 .new-item {
