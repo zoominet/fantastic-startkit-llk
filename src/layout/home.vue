@@ -3,7 +3,7 @@ const url =
     'https://linkard.oss-cn-beijing.aliyuncs.com/img/401660148927_.pic.jpg'
 
 import {
-    Flag,
+    Promotion,
     CirclePlusFilled,
     UserFilled,
     Search, Menu
@@ -51,16 +51,16 @@ const profileItemMargin = () => {
                 :collapse="false"
             >
                 <el-menu-item index="1" route="/home/dashboard">
-                    <el-icon><Flag /></el-icon>
+                    <el-icon><Promotion /></el-icon>
                     <template #title>学习</template>
                 </el-menu-item>
-                <el-menu-item index="2" route="/home/newcard">
+                <!-- <el-menu-item index="2" route="/home/newcard">
                     <el-icon><CirclePlusFilled /></el-icon>
                     <template #title>创建</template>
-                </el-menu-item>
+                </el-menu-item> -->
                 <el-menu-item index="3" route="/home/mycard">
                     <el-icon><Menu /></el-icon>
-                    <template #title>浏览</template>
+                    <template #title>卡集</template>
                 </el-menu-item>
                 <!-- <el-menu-item index="4" route="/home/profile" :style="{'margin-top':profileItemMargin()}"> -->
                 <el-menu-item index="4" route="/home/profile">

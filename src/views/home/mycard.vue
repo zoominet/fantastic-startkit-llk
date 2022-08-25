@@ -147,7 +147,7 @@ getSets()
                                 <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入新卡集名称" />
                             </el-form-item>
                             <el-form-item>
-                                <el-button @click="onSubmit">新增</el-button>
+                                <el-button type="primary" @click="onSubmit">新增</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>

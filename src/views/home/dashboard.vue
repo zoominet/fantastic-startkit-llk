@@ -21,7 +21,11 @@ const queueStore = useStudyQueueStore()
 import {
     ArrowLeft,
     ArrowRight,
-    Refresh
+    Refresh,
+    Plus,
+    Promotion,
+    DocumentChecked,
+    Document
 } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
 
@@ -47,7 +51,6 @@ const pageData = reactive({
     newNumType: 'success',
     oldNum: 0,
     oldNumType: 'success',
-    todayTotal: 0,
     nextStudyTime: '',
     cardSummary: '你当前拥有 1234 张卡片，已经学了 123 张卡片'
 })
@@ -100,17 +103,16 @@ const getShouldCards = () => {
             // 'Card': {
             //     'id@': '/StudyQueue/card_id'
             // },
-            'count': 0,
-            'query': 2
+            'count': 0
+            // 'query': 2
         },
-        'total@': '/[]/total',
+        // 'total@': '/[]/total',
         '@datasource': 'hikari'
     }
     api.post('get', querydata).then(res => {
 
         // console.log(res)
         if (res.ok === true) {
-            pageData.todayTotal = res.total
             if (res['[]']) {
                 let allQueueCards = res['[]']
                 pageData.nextStudyTime = getTimeStr(allQueueCards[0].StudyQueue.should_time)
@@ -415,13 +417,18 @@ const goNewCard = () => {
 
 <template>
     <!-- <el-page-header icon="CirclePlusFilled" title="新卡片" :content="pageData.cardSummary" @back="goNewCard" /> -->
-    <el-row>
+    <el-row :style="{'margin-top': '50px'}">
+        <el-col>
+            <el-button type="primary" size="large" :icon="Plus" round @click="goNewCard">创建新卡片</el-button>
+        </el-col>
+    </el-row>
+    <el-row :style="{'margin-top': '50px'}">
         <el-col :xs="0" :sm="4" :md="6" :lg="8" hidden-sm-only />
         <el-col :xs="24" :sm="16" :md="12" :lg="8">
             <el-button-group>
-                <el-button type="default" :icon="ArrowLeft" @click="handleGetPrevWeek" />
-                <el-button type="default" :style="{'font-size':'16px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
-                <el-button type="default" @click="handleGetNextvWeek">
+                <el-button type="text" :icon="ArrowLeft" @click="handleGetPrevWeek" />
+                <el-button type="text" :style="{'font-size':'16px'}" disabled>{{ weekboard.day1Str }} ～ {{ weekboard.day7Str }}</el-button>
+                <el-button type="text" @click="handleGetNextvWeek">
                     <el-icon class="el-icon--right"><ArrowRight /></el-icon>
                 </el-button>
             </el-button-group>
@@ -431,7 +438,7 @@ const goNewCard = () => {
     <el-row>
         <el-col :xs="0" :sm="2" :md="4" :lg="6" hidden-sm-only />
         <el-col :xs="24" :sm="20" :md="16" :lg="12">
-            <div class="demo-progress">
+            <div v-loading="pageData.loading" class="demo-progress">
                 <el-progress v-for="i in 7" :key="i" type="circle" width="65" :percentage="weekboard.dayPercentage[i-1]" :color="colors">
                     <span class="percentage-label" v-html="weekboard.weekStr[i-1]" />
                 </el-progress>
@@ -457,13 +464,13 @@ const goNewCard = () => {
         </el-col>
         <el-col :xs="0" :sm="2" :md="4" :lg="6" />
     </el-row>
-    <el-row>
+    <el-row :style="{'margin-top': '50px'}">
         <el-col :xs="0" :sm="4" :md="6" :lg="8" />
         <el-col :xs="24" :sm="16" :md="12" :lg="8">
             <el-card v-loading="pageData.loading" shadow="always" class="study-card">
                 <template #header>
                     <div class="card-header">
-                        <span>今日任务卡</span><el-tag size="small">剩余 {{ pageData.todayTotal }} 张</el-tag>
+                        <span>今日任务卡 <el-tag size="small">剩余 {{ dayboard.shouldNum }} 张</el-tag></span>
                         <el-button size="mini" :icon="Refresh" circle @click="getShouldCards" />
                     </div>
                 </template>
@@ -475,19 +482,19 @@ const goNewCard = () => {
                 </div> -->
                 <div class="card-body">
                     <el-badge :value="pageData.newNum" :max="1000" :type="pageData.newNumType">
-                        <el-button :style="{'width':'100px'}" disabled>新卡片</el-button>
+                        <el-button :icon="Document" :style="{'width':'100px'}" disabled>新卡片</el-button>
                     </el-badge>
                     <!-- <el-divider direction="vertical" /> -->
                     <el-badge :value="pageData.oldNum" :max="1000" :type="pageData.oldNumType">
-                        <el-button :style="{'width':'100px'}" disabled>复习卡片</el-button>
+                        <el-button :icon="DocumentChecked" :style="{'width':'100px'}" disabled>复习卡片</el-button>
                     </el-badge>
 
                     <el-divider>
                         <el-icon><Check /></el-icon>
                     </el-divider>
                     <div class="study-button">
-                        <el-button v-show="pageData.newNum+pageData.oldNum>0" type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
-                        <el-tag v-show="pageData.newNum+pageData.oldNum==0" effect="dark" size="large">下次学习时间：{{ pageData.nextStudyTime }}</el-tag>
+                        <el-button v-show="pageData.newNum+pageData.oldNum>0" :icon="Promotion" type="primary" size="large" round @click="goStudy">开 始 学 习</el-button>
+                        <el-tag v-show="pageData.newNum+pageData.oldNum==0" size="large">下次学习时间：{{ pageData.nextStudyTime }}</el-tag>
                     </div>
                 </div>
             </el-card>
@@ -498,9 +505,6 @@ const goNewCard = () => {
 
 <style lang="scss" scoped>
 // scss
-.el-col {
-    margin-top: 50px;
-}
 .demo-progress .el-progress--line {
     margin-bottom: 15px;
 }
