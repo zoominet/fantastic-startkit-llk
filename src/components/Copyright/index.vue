@@ -9,7 +9,7 @@ const settingsStore = useSettingsStore()
         <span class="icon">©</span>
         <span>2022</span>
         <!-- <a v-if="settingsStore.copyright.website" :href="settingsStore.copyright.website" target="_blank" rel="noopener">{{ settingsStore.copyright.company }}</a> -->
-        <span>零卡</span>
+        <span>零卡爱学</span>
         <!-- <a v-if="settingsStore.copyright.beian" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">{{ settingsStore.copyright.beian }}</a> -->
     </footer>
 </template>

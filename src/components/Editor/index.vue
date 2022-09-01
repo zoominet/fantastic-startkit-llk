@@ -46,7 +46,7 @@ const defaultSetting = ref({
     // content_css: settingsStore.app.colorScheme === 'light' ? 'tinymce/skins/content/default/content.min.css' : 'tinymce/skins/content/dark/content.min.css',
     skin_url: 'tinymce/skins/ui/oxide',
     content_css: 'tinymce/skins/content/default/content.min.css',
-    min_height: 250,
+    min_height: 200,
     // max_height: 600,
     selector: 'textarea',
     plugins: 'autolink autoresize fullscreen image insertdatetime link lists media preview table wordcount code searchreplace',

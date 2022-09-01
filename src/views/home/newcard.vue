@@ -229,6 +229,7 @@ getCartSets()
             <!-- <TEditor ref="editor" v-model="cardForm.frontContent" /> -->
             <Editor
                 v-model="cardForm.frontContent"
+                :init="{'min_height':'500'}"
             />
             <!-- <editor
                 v-model="cardForm.frontContent"

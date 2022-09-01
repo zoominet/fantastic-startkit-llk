@@ -129,6 +129,26 @@ const getSets = () => {
 }
 getSets()
 
+const dialogData = reactive({
+    dialogCardVisible: false,
+    dialogTitle: '12 / 90',
+    loading: false,
+    frontContent: '',
+    backContent: '',
+    backColor: '#ECEFF1',
+    lookAnswer: false,
+    studyCompleted: false
+})
+
+const dialogContentHeight = () => {
+    return (window.innerHeight - 300) + 'px'
+}
+
+const showCardDialog = cardIndex => {
+    console.log(cardIndex)
+    dialogData.dialogTitle = (cardIndex + 1) + ' / ' + pageData.cards.length
+    dialogData.dialogCardVisible = true
+}
 </script>
 
 <template>
@@ -196,7 +216,7 @@ getSets()
                             </div>
                             <div :inline="true" class="set-item">
                                 <el-icon color="var(--el-color-primary)"><CopyDocument /></el-icon> {{ set.CardSet.card_num }} 张
-                                <el-tag v-if="set.CardSet.set_status == 1" type="success" size="small" round>学习中</el-tag>
+                                <el-tag v-if="set.CardSet.set_status == 1" size="small" round>学习中</el-tag>
                             </div>
                         </el-card>
                     </el-col>
@@ -214,13 +234,6 @@ getSets()
                             <el-input v-model="formSearch.keyword" placeholder="关键字" />
                         </el-form-item>
                         <el-form-item label="">
-                            <el-select v-model="formSearch.keyscore" :style="{'width':'100px'}" placeholder="掌握程度">
-                                <el-option label="困难" value="1" />
-                                <el-option label="良好" value="2" />
-                                <el-option label="简单" value="3" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="">
                             <el-select v-model="formSearch.keyflag" :style="{'width':'100px'}" placeholder="旗标">
                                 <el-option label="1" value="1">
                                     <el-icon><Flag /></el-icon>
@@ -231,6 +244,13 @@ getSets()
                                 <el-option label="3" value="3">
                                     <el-icon><Flag /></el-icon>
                                 </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="">
+                            <el-select v-model="formSearch.keyscore" :style="{'width':'100px'}" placeholder="掌握程度">
+                                <el-option label="困难" value="1" />
+                                <el-option label="良好" value="2" />
+                                <el-option label="简单" value="3" />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
@@ -255,14 +275,14 @@ getSets()
                                     </div>
                                 </el-card> -->
 
-                                <el-card v-for="card in pageData.cards" :key="card" class="box-card" shadow="hover">
+                                <el-card v-for="(card,cardIdx) in pageData.cards" :key="card" class="box-card" shadow="hover" @click="showCardDialog(cardIdx)">
                                     <div class="card-header">
                                         <span />
                                         <el-dropdown size="small">
                                             <el-icon color="var(--el-color-info-light-5)"><MoreFilled /></el-icon>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item>加入学习</el-dropdown-item>
+                                                    <el-dropdown-item>加入学习队列</el-dropdown-item>
                                                     <el-dropdown-item>编辑</el-dropdown-item>
                                                     <el-dropdown-item>删除</el-dropdown-item>
                                                 </el-dropdown-menu>
@@ -293,6 +313,46 @@ getSets()
             </el-row>
         </el-col>
     </el-row>
+
+    <el-dialog v-model="dialogData.dialogCardVisible" width="90%" top="8vh" center="true" :title="dialogData.dialogTitle">
+        <el-row v-loading="dialogData.loading" class="dialogContentRow">
+            <el-col :span="12" :style="{height:dialogContentHeight()}" class="front-card">
+                <el-scrollbar :style="{height:dialogContentHeight(),'padding-left':'10px','padding-right':'10px'}">
+                    <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
+                    <p />
+                    <div v-html="dialogData.frontContent" />
+                </el-scrollbar>
+            </el-col>
+            <el-col :span="12" class="back-card" :style="{height:dialogContentHeight(),'background':dialogData.backColor}">
+                <el-scrollbar :style="{height:dialogContentHeight(),'padding-left':'20px','padding-right':'10px'}">
+                    <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
+                    <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
+                        <div v-html="dialogData.backContent" />
+                    </div>
+                </el-scrollbar>
+            </el-col>
+        </el-row>
+        <template #footer>
+            <el-row>
+                <el-col :span="2">
+                    <el-button size="default" class="buttonArea" round @click="goBack"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+                </el-col>
+                <el-col v-show="!dialogData.studyCompleted" :span="20">
+                    <el-button v-show="!dialogData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
+
+                    <div v-show="pageData.lookAnswer">
+                        <el-button type="danger" round @click="labelAndNextAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
+                        <el-button type="warning" round @click="labelAndNextAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
+                        <el-button type="success" round @click="labelAndNextAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
+                    </div>
+                </el-col>
+                <el-col :span="2" />
+            </el-row>
+            <!-- <span class="dialog-footer">
+                <el-button @click="dialogData.dialogCardVisible = false">Cancel</el-button>
+            </span> -->
+        </template>
+    </el-dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -304,8 +364,8 @@ getSets()
     margin-top: -10px;
 }
 .set-item {
-    font-size: 16px;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 15px;
     text-align: left;
 }
 .card-item {
@@ -345,4 +405,57 @@ getSets()
 .el-pagination {
     justify-content: center;
 }
+.back-card {
+    border: 1px solid #cfd8dc;
+    box-shadow: --el-box-shadow-dark;
+    margin-top: 0;
+    font-size: 18px;
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 300px;
+}
+.front-card {
+    border: 1px solid #cfd8dc;
+    margin-top: 0;
+    font-size: 25px;
+    min-height: 300px;
+}
+.Num-Button-Key {
+    align-items: center;
+    // background: rgb(125 125 125 / 10%);
+    background-color: #e8e8f1;
+    border-radius: 3px;
+    box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgb(30 35 90 / 40%);
+    color: #909399;
+    display: flex;
+    justify-content: center;
+    margin-right: 0.4em;
+    position: relative;
+    // padding: 0 0 2px;
+    border: 0;
+    // top: -1px;
+    width: 25px;
+    height: 20px;
+}
+.Space-Button-Key {
+    align-items: center;
+    // background: rgb(125 125 125 / 10%);
+    background-color: #e8e8f1;
+    border-radius: 3px;
+    box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgb(30 35 90 / 40%);
+    color: #909399;
+    display: flex;
+    justify-content: center;
+    margin-right: 0.4em;
+    position: relative;
+    // padding: 0 0 2px;
+    border: 0;
+    // top: -1px;
+    width: 80px;
+    height: 20px;
+}
+.dialogContentRow {
+    margin: -20px 0;
+}
+
 </style>
