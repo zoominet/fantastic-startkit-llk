@@ -205,8 +205,8 @@ getCartSets()
                     </el-select>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">新增</el-button>
-                    <el-button link size="small" @click="resetContent">重置</el-button>
+                    <el-button type="primary" round @click="onSubmit">新增</el-button>
+                    <el-button type="primary" link @click="resetContent">重置</el-button>
                     <!-- <el-button type="info" plain @click="resetContent">重置</el-button> -->
                 <!-- <el-button type="primary" @click="onSubmit">新增&继续</el-button> -->
                 </el-form-item>

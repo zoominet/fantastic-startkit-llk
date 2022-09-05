@@ -9,11 +9,13 @@ import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
 import { reactive } from 'vue'
+import moment from 'moment'
 
 const formSearch = reactive({
     keyword: '',
     keyscore: '',
-    keyflag: ''
+    keyflag: '',
+    fromAllSets: false
 })
 const newSetForm = reactive({
     setname: '',
@@ -73,6 +75,7 @@ const getCards = setId => {
     api.post('get', querydata).then(res => {
         if (res.ok === true) {
             pageData.cards = res['[]']
+            reviewCard.setCards(pageData.cards)
             pageData.cardCount = res['total']
             pageData.cardLoading = false
         } else {
@@ -108,7 +111,7 @@ const getSets = () => {
         if (res.ok === true) {
             pageData.sets = res['[]']
             pageData.defaultSetId = pageData.sets[0].CardSet.id
-            // getCards(pageData.defaultSetId)
+            getCards(pageData.defaultSetId)
             pageData.setLoading = false
             // console.log(pageData.sets)
         } else {
@@ -129,15 +132,27 @@ const getSets = () => {
 }
 getSets()
 
+// review cards
+import useReviewCardStore from '@/store/modules/reviewcard'
+const reviewCard = useReviewCardStore()
+import useStudyQueueStore from '@/store/modules/studyqueue'
+const queueStore = useStudyQueueStore()
+import useTokenStore from '@/store/modules/token'
+const tokenStore = useTokenStore()
+
 const dialogData = reactive({
     dialogCardVisible: false,
-    dialogTitle: '12 / 90',
+    dialogTitle: '',
     loading: false,
     frontContent: '',
     backContent: '',
     backColor: '#ECEFF1',
     lookAnswer: false,
-    studyCompleted: false
+    labelCard: false,
+    studyCompleted: false,
+    prevButton: false,
+    nextButton: false,
+    cardIndex: 0
 })
 
 const dialogContentHeight = () => {
@@ -145,9 +160,213 @@ const dialogContentHeight = () => {
 }
 
 const showCardDialog = cardIndex => {
-    console.log(cardIndex)
-    dialogData.dialogTitle = (cardIndex + 1) + ' / ' + pageData.cards.length
+    // console.log(cardIndex)
     dialogData.dialogCardVisible = true
+    dialogData.cardIndex = cardIndex
+    dialogData.dialogTitle = (cardIndex + 1) + ' / ' + pageData.cards.length
+    dialogData.prevButton = reviewCard.prevButton(dialogData.cardIndex)
+    dialogData.nextButton = reviewCard.nextButton(dialogData.cardIndex)
+
+    dialogData.loading = true
+    dialogData.lookAnswer = false
+    dialogData.backColor = '#ECEFF1'
+
+    let currCard = reviewCard.getCard(cardIndex).Card
+    // console.log('currCard', currCard)
+
+    if (currCard) {
+        dialogData.frontContent = currCard.front_content
+        dialogData.backContent = currCard.back_content
+        dialogData.loading = false
+        dialogData.labelCard = false
+        timeCounter.beginTime = moment().format('X')
+        sessionDuration(true)
+
+    }
+}
+const prevCard = () => {
+    dialogData.cardIndex--
+    showCardDialog(dialogData.cardIndex)
+}
+const nextCard = () => {
+    dialogData.cardIndex++
+    showCardDialog(dialogData.cardIndex)
+}
+const lookAnswerAction = () => {
+    dialogData.lookAnswer = true
+    dialogData.backColor = ''
+}
+// 设置学习标签
+const labelCardAction = mLabel => {
+    // console.log(mLabel)
+    dialogData.loading = true
+    dialogData.labelCard = true
+    timeCounter.endTime = moment().format('X')
+    sessionDuration(false)
+
+    let currCard = reviewCard.getCard(dialogData.cardIndex).Card
+    // console.log('currCard', currCard)
+
+    let currentTime = Date.now()
+    let shouldTime = currentTime + 5 * 60 * 1000
+
+    let querydata = {
+        'StudyQueue': {
+            '@role': 'OWNER',
+            'card_id': currCard.id
+        },
+        '@datasource': 'hikari'
+    }
+
+    api.post('get', querydata).then(res => {
+        if (res.ok === true && res.StudyQueue) {
+            addStudyRecord(res.StudyQueue.id, mLabel, res.StudyQueue.study_type == 1 ? res.StudyQueue.study_cycle + 1 : 1)
+        } else {
+            // 新增一个queue
+            let newqueue = {
+                'StudyQueue': {
+                    'card_id': currCard.id,
+                    'set_id': currCard.set_id,
+                    'should_time': shouldTime,
+                    'append_time': getCurrentDatetime(),
+                    'study_first_time': getCurrentDatetime(),
+                    'study_last_time': getCurrentDatetime(),
+                    'update_time': getCurrentDatetime(),
+                    'update_by': tokenStore.token,
+                    'create_time': getCurrentDatetime(),
+                    'create_by': tokenStore.token,
+                    'study_type': 1,
+                    'study_cycle': 1
+                },
+                'tag': 'StudyQueue',
+                '@datasource': 'hikari'
+            }
+            api.post('post', newqueue).then(res => {
+                if (res.ok === true) {
+                    addStudyRecord(res.StudyQueue.id, mLabel, 1)
+                } else {
+                    ElMessage({
+                        type: 'error',
+                        showClose: true,
+                        message: res.msg
+                    })
+                }
+
+            }).catch(error => {
+                ElMessage({
+                    type: 'error',
+                    showClose: true,
+                    message: error
+                })
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+
+}
+const addStudyRecord = (qId, mLabel, sCycle) => {
+    // console.log(qId, mLabel, sCycle)
+    let recorddata = {
+        'StudyRecord': {
+            'queue_id': qId,
+            'study_time': getCurrentDatetime(),
+            'create_time': getCurrentDatetime(),
+            'create_by': tokenStore.token,
+            'key_score': mLabel,
+            'seconds': timeCounter.seconds,
+            'study_cycle': sCycle,
+            'study_day': queueStore.getToday(),
+            '@role': 'OWNER'
+        },
+        'tag': 'StudyRecord',
+        '@datasource': 'hikari'
+    }
+    api.post('post', recorddata).then(res => {
+        if (res.ok === true) {
+            // console.log(res)
+            dialogData.loading = false
+        } else {
+            ElMessage({
+                type: 'error',
+                showClose: true,
+                message: res.msg
+            })
+        }
+
+    }).catch(error => {
+        ElMessage({
+            type: 'error',
+            showClose: true,
+            message: error
+        })
+    })
+}
+const getCurrentDatetime = () => {
+    const date = new Date(+new Date() + 8 * 3600 * 1000)
+    const str = date.toISOString().slice(0, 19).replace('T', ' ')
+    // console.log('ctime', str)
+    return str
+}
+
+const timeCounter = reactive({
+    beginTime: moment().format('X'),
+    endTime: 0,
+    seconds: 0,
+    strTime: '',
+    timer: null
+})
+const sessionDuration = isBegin => {
+    if (timeCounter.timer)
+        clearInterval(timeCounter.timer)
+    if (isBegin == true) {
+        timeCounter.timer = setInterval(() => {
+            let date = moment().format('X') - timeCounter.beginTime
+            // timeCounter.strTime = formateSeconds(date)
+            // console.log(timeCounter.strTime)
+        }, 1000)
+    } else {
+        let date = timeCounter.endTime - timeCounter.beginTime
+        if (date > 60)
+            date = 60
+        timeCounter.seconds = date
+        // timeCounter.strTime = formateSeconds(date)
+    }
+}
+
+document.onkeyup = function() {
+    let key = window.event.keyCode
+    // console.log('key', key)
+    if (dialogData.dialogCardVisible == true && dialogData.loading == false) {
+        if (dialogData.labelCard == false) {
+            if (dialogData.lookAnswer == false) {
+                if (key == 32 || key == 13) {
+                    lookAnswerAction()
+                }
+            } else {
+                if (key == 51) {
+                    labelCardAction(3)
+                } else if (key == 49) {
+                    labelCardAction(1)
+                } else if (key == 50) {
+                    labelCardAction(2)
+                } else {
+                // nothing
+                }
+            }
+        }
+        if (dialogData.prevButton == true && key == 37) {
+            prevCard()
+        }
+        if (dialogData.nextButton == true && key == 39) {
+            nextCard()
+        }
+    }
 }
 </script>
 
@@ -163,11 +382,11 @@ const showCardDialog = cardIndex => {
                 <el-row v-show="newSetForm.isDisplay">
                     <el-col>
                         <el-form :inline="true" size="mini" :model="newSetForm">
-                            <el-form-item label="">
+                            <el-form-item>
                                 <el-input v-model="newSetForm.setname" :class="{'setname':1}" placeholder="输入新卡集名称" />
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onSubmit">新增</el-button>
+                                <el-button type="primary" round @click="onSubmit">新增</el-button>
                             </el-form-item>
                         </el-form>
                     </el-col>
@@ -230,10 +449,13 @@ const showCardDialog = cardIndex => {
                 </el-col>
                 <el-col :span="20" :style="{'text-align':'right'}">
                     <el-form :inline="true" size="mini" :model="formSearch">
-                        <el-form-item label="">
-                            <el-input v-model="formSearch.keyword" placeholder="关键字" />
+                        <el-form-item>
+                            <el-checkbox label="全部卡集" name="formSearch.fromAllSets" />
                         </el-form-item>
-                        <el-form-item label="">
+                        <el-form-item>
+                            <el-input v-model="formSearch.keyword" placeholder="关键字/标签" />
+                        </el-form-item>
+                        <el-form-item>
                             <el-select v-model="formSearch.keyflag" :style="{'width':'100px'}" placeholder="旗标">
                                 <el-option label="1" value="1">
                                     <el-icon><Flag /></el-icon>
@@ -246,7 +468,7 @@ const showCardDialog = cardIndex => {
                                 </el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="">
+                        <el-form-item>
                             <el-select v-model="formSearch.keyscore" :style="{'width':'100px'}" placeholder="掌握程度">
                                 <el-option label="困难" value="1" />
                                 <el-option label="良好" value="2" />
@@ -254,10 +476,10 @@ const showCardDialog = cardIndex => {
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button @click="formSearchSubmit">搜索</el-button>
+                            <el-button text bg type="primary" @click="formSearchSubmit">搜索</el-button>
                         </el-form-item>
                         <el-form-item :style="{'margin-right':'0'}">
-                            <el-button link size="small" @click="formSearchReset">重置</el-button>
+                            <el-button link type="primary" @click="formSearchReset">重置</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
@@ -282,7 +504,7 @@ const showCardDialog = cardIndex => {
                                             <el-icon color="var(--el-color-info-light-5)"><MoreFilled /></el-icon>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item>加入学习队列</el-dropdown-item>
+                                                    <!-- <el-dropdown-item>加入学习队列</el-dropdown-item> -->
                                                     <el-dropdown-item>编辑</el-dropdown-item>
                                                     <el-dropdown-item>删除</el-dropdown-item>
                                                 </el-dropdown-menu>
@@ -314,11 +536,14 @@ const showCardDialog = cardIndex => {
         </el-col>
     </el-row>
 
-    <el-dialog v-model="dialogData.dialogCardVisible" width="90%" top="8vh" center="true" :title="dialogData.dialogTitle">
+    <el-dialog v-model="dialogData.dialogCardVisible" width="90%" top="8vh" center="true">
+        <template #title>
+            <el-tag round size="large"><div :style="{'font-size':'16px','font-weight':'bold'}" v-html="dialogData.dialogTitle" /></el-tag>
+        </template>
         <el-row v-loading="dialogData.loading" class="dialogContentRow">
             <el-col :span="12" :style="{height:dialogContentHeight()}" class="front-card">
-                <el-scrollbar :style="{height:dialogContentHeight(),'padding-left':'10px','padding-right':'10px'}">
-                    <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
+                <el-scrollbar :style="{height:dialogContentHeight(),'padding-left':'10px','padding-right':'10px','text-align':'center'}">
+                    <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
                     <p />
                     <div v-html="dialogData.frontContent" />
                 </el-scrollbar>
@@ -326,7 +551,8 @@ const showCardDialog = cardIndex => {
             <el-col :span="12" class="back-card" :style="{height:dialogContentHeight(),'background':dialogData.backColor}">
                 <el-scrollbar :style="{height:dialogContentHeight(),'padding-left':'20px','padding-right':'10px'}">
                     <!-- <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
-                    <div v-show="pageData.lookAnswer" :style="{'text-align':'left'}">
+                    <div v-show="dialogData.lookAnswer" :style="{'text-align':'left'}">
+                        <p />
                         <div v-html="dialogData.backContent" />
                     </div>
                 </el-scrollbar>
@@ -335,18 +561,20 @@ const showCardDialog = cardIndex => {
         <template #footer>
             <el-row>
                 <el-col :span="2">
-                    <el-button size="default" class="buttonArea" round @click="goBack"><el-icon><ArrowLeft /></el-icon>返回</el-button>
+                    <el-button v-show="dialogData.prevButton" size="default" class="buttonArea" round @click="prevCard">上个&nbsp;&nbsp;<kbd class="Num-Button-Key">←</kbd></el-button>
                 </el-col>
                 <el-col v-show="!dialogData.studyCompleted" :span="20">
                     <el-button v-show="!dialogData.lookAnswer" type="primary" round @click="lookAnswerAction">显 示 背 面 &nbsp;&nbsp;<kbd class="Space-Button-Key">space</kbd></el-button>
 
-                    <div v-show="pageData.lookAnswer">
-                        <el-button type="danger" round @click="labelAndNextAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
-                        <el-button type="warning" round @click="labelAndNextAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
-                        <el-button type="success" round @click="labelAndNextAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
+                    <div v-show="dialogData.lookAnswer && !dialogData.labelCard">
+                        <el-button type="danger" round @click="labelCardAction(1)">困难 &nbsp;&nbsp;<kbd class="Num-Button-Key">1</kbd></el-button>
+                        <el-button type="warning" round @click="labelCardAction(2)">良好 &nbsp;&nbsp;<kbd class="Num-Button-Key">2</kbd></el-button>
+                        <el-button type="success" round @click="labelCardAction(3)">简单 &nbsp;&nbsp;<kbd class="Num-Button-Key">3</kbd></el-button>
                     </div>
                 </el-col>
-                <el-col :span="2" />
+                <el-col :span="2">
+                    <el-button v-show="dialogData.nextButton" size="default" class="buttonArea" round @click="nextCard">下个&nbsp;&nbsp;<kbd class="Num-Button-Key">→</kbd></el-button>
+                </el-col>
             </el-row>
             <!-- <span class="dialog-footer">
                 <el-button @click="dialogData.dialogCardVisible = false">Cancel</el-button>
@@ -456,6 +684,7 @@ const showCardDialog = cardIndex => {
 }
 .dialogContentRow {
     margin: -20px 0;
+    text-align: center;
 }
 
 </style>
