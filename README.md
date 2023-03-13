@@ -1,6 +1,6 @@
 <h1 align="center">Fantastic-startkit</h1>
 
-<p align="center">一款<b>开箱即用</b>的 Vue 项目启动套件，基于 Vue(3.x) & Vite(2.x)</p>
+<p align="center">一款<b>简单好用</b>的 Vue 项目启动套件</p>
 
 <p align="center">
     <a href="https://hooray.gitee.io/fantastic-startkit/" target="_blank">官网</a>
@@ -9,6 +9,7 @@
 
 ## 特点
 
+- 支持 TypeScript
 - 默认集成 vue-router 和 pinia
 - 支持基于文件系统的路由
 - 全局 SCSS 资源引入

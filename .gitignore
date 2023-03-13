@@ -3,6 +3,7 @@ node_modules
 dist*
 dist-ssr
 *.local
-.eslintrc-auto-import.json
+.eslintcache
+.stylelintcache
 src/assets/sprites/*.*
 !src/assets/sprites/.gitkeep
